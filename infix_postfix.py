@@ -5,7 +5,6 @@ class InfixToPostfix:
     """
     this class purpose is to change infix expression to postfix expression
     """
-
     @staticmethod
     def infix_to_postfix(infix_exercise: str) -> list:
         """
@@ -15,9 +14,9 @@ class InfixToPostfix:
         :return: list which includes the same math exercise but in postfix
         """
         # remove the meaningless spaces
-        infix_exercise.replace(" ", "")
+        infix_exercise = infix_exercise.replace(' ', '')
         # same thing
-        infix_exercise.replace("--", "")
+        infix_exercise = infix_exercise.replace('--', '')
 
         operators = []
         postfix_exercise = []
@@ -44,17 +43,18 @@ class InfixToPostfix:
     def _operand_handling(infix_exercise: str, postfix_exercise: list, index: int) -> str and list and int:
         """
         this class gets a string of infix expression, a list of the postfix expression and an index which
-        point on the start of a number. The class adds the full number (can be floated) to the postfix list
+        point on the start of the number. The class adds the full number (can be floated) to the postfix list.
         :param infix_exercise: a string which is an infix expression
         :param postfix_exercise: a list which handled part of the postfix expression of the infix_exercise
         :param index: the start index of the operand we are going on right now
         :return: all the updated variables
         """
         start_of_number_index = index
-        while index + 1 != len(infix_exercise) and (str.isdigit(infix_exercise[index]) or infix_exercise[index] == '.'):
+        while index + 1 != len(infix_exercise) and (str.isdigit(infix_exercise[index+1]) or infix_exercise[index+1] == '.'):
             index += 1
-        postfix_exercise.append(float(infix_exercise[start_of_number_index:index]))
 
+        postfix_exercise.append(float(infix_exercise[start_of_number_index:index+1]))
+        index += 1
         return infix_exercise, postfix_exercise, index
 
     @staticmethod
@@ -94,4 +94,4 @@ class InfixToPostfix:
         """
         if operator1 == '(' or operator2 == '(':
             return False
-        return True if OPERATORS_DICT[operator1] > OPERATORS_DICT[operator2] else False
+        return True if OPERATORS_DICT[operator1] >= OPERATORS_DICT[operator2] else False
