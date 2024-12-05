@@ -7,5 +7,5 @@ class ArithmeticFuncs(ABC):
     """
     @staticmethod
     @abstractmethod
-    def resolve(cls, arg1, arg2=0):
+    def resolve(arg1, arg2=0):
         ...

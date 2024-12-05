@@ -1,4 +1,5 @@
-OPERATORS_DICT = {'+': 1, '-': 1, '*': 2, '/': 2, '^': 3, '@': 5, '$': 5, '&': 5, '%': 4, '~': 6, '!': 6}
+# I chose to call 'U' as unary-minus
+OPERATORS_DICT = {'+': 1, '-': 1, '*': 2, '/': 2, '^': 3, '@': 5, '$': 5, '&': 5, '%': 4, '~': 6, '!': 6, 'U':3.5}
 
 
 class InfixToPostfix:
@@ -15,8 +16,6 @@ class InfixToPostfix:
         """
         # remove the meaningless spaces
         infix_exercise = infix_exercise.replace(' ', '')
-        # same thing
-        infix_exercise = infix_exercise.replace('--', '')
 
         operators = []
         postfix_exercise = []
@@ -70,6 +69,11 @@ class InfixToPostfix:
         :param index: the start index of the operand we are going on right now
         :return: all the updated variables
         """
+        print(operators)
+        # checking if it is a unary-minus and replace it to my custom char if its necessary
+        if infix_exercise[index] == '-' and (index == 0 or infix_exercise[index-1] in OPERATORS_DICT.keys()):
+            infix_exercise = infix_exercise[:index] + 'U' + infix_exercise[index+1:]
+
         if infix_exercise[index] == ')':
             while operators[-1] != '(':
                 postfix_exercise.append(operators.pop())
@@ -94,4 +98,4 @@ class InfixToPostfix:
         """
         if operator1 == '(' or operator2 == '(':
             return False
-        return True if OPERATORS_DICT[operator1] >= OPERATORS_DICT[operator2] else False
+        return True if OPERATORS_DICT[operator1] > OPERATORS_DICT[operator2] else False
