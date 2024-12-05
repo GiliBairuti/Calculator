@@ -1,5 +1,6 @@
 from calculator_interface import Calculator
 from infix_postfix import InfixToPostfix
+from postfix_result import GoingOverTheExercise
 
 
 class Calculation(Calculator):
@@ -10,5 +11,5 @@ class Calculation(Calculator):
     @staticmethod
     def calculation_answer(infix_exercise: str) -> list:
         postfix_exercise = InfixToPostfix.infix_to_postfix(infix_exercise)
-        return postfix_exercise
+        return GoingOverTheExercise.postfix_to_result(postfix_exercise)
 
