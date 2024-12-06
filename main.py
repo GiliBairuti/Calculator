@@ -2,7 +2,7 @@ from calculation import *
 
 
 def main():
-    exercise = "9+5*3-(2@6)/2"
+    exercise = "5&~---3!*2-(4%3)^3!"
     print(exercise + " = " + str(Calculation.calculation_answer(exercise)))
 
 

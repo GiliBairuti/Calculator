@@ -5,18 +5,18 @@ OPERATORS_PRIORITY_DICT = {MathOperators.ADD.value: 1, MathOperators.SUB.value: 
                            MathOperators.DIV.value: 2, MathOperators.POW.value: 3, MathOperators.AVG.value: 5,
                            MathOperators.MAX.value: 5, MathOperators.MIN.value: 5, MathOperators.MODULO.value: 4,
                            MathOperators.NEG.value: 6, MathOperators.FACTORIAL.value: 6,
-                           MathOperators.UNARY_MINUS.value: 3.5}
+                           MathOperators.UNARY_MINUS.value: 10}
 
 
 class InfixToPostfix:
     """
-    this class's purpose is to change infix expression to postfix expression
+    This class's purpose is to change infix expression to postfix expression
     """
 
     @staticmethod
     def infix_to_postfix(infix_exercise: str) -> list:
         """
-        this function gets a string which is a math exercise in infix,
+        This function gets a string which is a math exercise in infix,
         and change it into a list of the numbers and the chars of the operators in a list ordered in postfix
         :param infix_exercise: holding a string which represents a mathematical infix expression
         :return: list which includes the same math exercise but in postfix
@@ -48,7 +48,7 @@ class InfixToPostfix:
     @staticmethod
     def _operand_handling(infix_exercise: str, postfix_exercise: list, index: int) -> str and list and int:
         """
-        this class gets a string of infix expression, a list of the postfix expression and an index which
+        This class gets a string of infix expression, a list of the postfix expression and an index which
         point on the start of the number. The class adds the full number (can be floated) to the postfix list.
         :param infix_exercise: a string which is an infix expression
         :param postfix_exercise: a list which handled part of the postfix expression of the infix_exercise
@@ -68,7 +68,7 @@ class InfixToPostfix:
     def _operator_handling(infix_exercise: str, postfix_exercise: list, operators: list,
                            index: int) -> str and list and list and int:
         """
-        this class gets a string of infix expression, a list of the postfix expression, a list with operators
+        This class gets a string of infix expression, a list of the postfix expression, a list with operators
         and an index which point on the start of a number.
         The class handles with an operator according to the postfix representation
         :param infix_exercise: a string which is an infix expression
@@ -81,13 +81,20 @@ class InfixToPostfix:
         if infix_exercise[index] == '-' and (index == 0 or infix_exercise[index - 1] in OPERATORS_PRIORITY_DICT.keys()):
             infix_exercise = infix_exercise[:index] + 'U' + infix_exercise[index + 1:]
 
+        # the treatment of ~ is different because it is the only one infix operator
+        if infix_exercise[index] == '~':
+            infix_exercise, postfix_exercise = \
+                InfixToPostfix._negative_handling(infix_exercise, postfix_exercise, index)
+
+        # the treatment of brackets is different because it always in the first priority
         if infix_exercise[index] == ')':
             while operators[-1] != '(':
                 postfix_exercise.append(operators.pop())
             operators.pop()
 
         else:
-            while len(operators) != 0 and InfixToPostfix._stronger_operator(operators[-1], infix_exercise[index]):
+            while len(operators) != 0 and len(postfix_exercise) != 0 and \
+                    InfixToPostfix._stronger_operator(operators[-1], infix_exercise[index]):
                 postfix_exercise.append(operators.pop())
             operators.append(infix_exercise[index])
         index += 1
@@ -95,10 +102,29 @@ class InfixToPostfix:
         return infix_exercise, postfix_exercise, operators, index
 
     @staticmethod
+    def _negative_handling(infix_exercise: str, postfix_exercise: list,index: int) -> str and list:
+        """
+        This func gets an infix expression which starts with ~ and handling this ~ operator.
+        Negative operator is the only infix operator, so we have to handle it differently.
+        :param infix_exercise: a string which is an infix expression
+        :param postfix_exercise: a list which handled part of the postfix expression of the infix_exercise
+        :param index: the ~ index in the infix expression
+        :return: the updated variables
+        """
+        index += 1
+        while not str.isdigit(infix_exercise[index]):
+            index += 1
+        infix_exercise, postfix_exercise, end_of_num = InfixToPostfix._operand_handling(infix_exercise, postfix_exercise, index)
+
+        # removing the number from the expression
+        infix_exercise = infix_exercise[:index] + infix_exercise[end_of_num:]
+        return infix_exercise, postfix_exercise
+
+    @staticmethod
     def _stronger_operator(operator1: chr, operator2: chr) -> chr:
         """
-        this class gets 2 chars of arithmetic signs and return True if the first one
-        is primer than the second one, otherwise False
+        This func gets 2 chars of arithmetic signs and return True if the first one
+        is primer than the second one, otherwise False.
         :param operator1: operator
         :param operator2: operator
         :return: boolean variable
@@ -106,8 +132,8 @@ class InfixToPostfix:
         if operator1 == '(' or operator2 == '(':
             return False
 
-        # because they are infix operators
-        if operator1 == 'U' or operator1 == '~':
+        # because it can repeat several times one after the other
+        if operator1 == 'U':
             return True if OPERATORS_PRIORITY_DICT[operator1] > OPERATORS_PRIORITY_DICT[operator2] else False
 
         return True if OPERATORS_PRIORITY_DICT[operator1] >= OPERATORS_PRIORITY_DICT[operator2] else False

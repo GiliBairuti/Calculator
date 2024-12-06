@@ -22,8 +22,8 @@ class GoingOverTheExercise:
     def postfix_to_result(postfix_exercise: list) -> float:
         """
         This function is getting a postfix expression and return its result
-        :param postfix_exercise:
-        :return:
+        :param postfix_exercise: a list which holds a postfix expression
+        :return: a float number which is the result of the expression
         """
         result = 0
         index = 0
