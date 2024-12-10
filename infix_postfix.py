@@ -5,7 +5,7 @@ OPERATORS_PRIORITY_DICT = {MathOperators.ADD.value: 1, MathOperators.SUB.value: 
                            MathOperators.DIV.value: 2, MathOperators.POW.value: 3, MathOperators.AVG.value: 5,
                            MathOperators.MAX.value: 5, MathOperators.MIN.value: 5, MathOperators.MODULO.value: 4,
                            MathOperators.NEG.value: 6, MathOperators.FACTORIAL.value: 6,
-                           MathOperators.UNARY_MINUS.value: 10}
+                           MathOperators.UNARY_MINUS_REGULAR.value: 2.5, MathOperators.UNARY_MINUS_AFTER_NEG.value: 10}
 
 
 class InfixToPostfix:
@@ -41,6 +41,7 @@ class InfixToPostfix:
 
         # add the operators that are left
         while len(operators) != 0:
+            operators = InfixToPostfix._return_the_unary_minus(operators)
             postfix_exercise.append(operators.pop(len(operators) - 1))
 
         return postfix_exercise
@@ -78,8 +79,13 @@ class InfixToPostfix:
         :return: all the updated variables
         """
         # checking if it is a unary-minus and replace it to my custom char if its necessary
-        if infix_exercise[index] == '-' and (index == 0 or infix_exercise[index - 1] in OPERATORS_PRIORITY_DICT.keys()):
-            infix_exercise = infix_exercise[:index] + 'U' + infix_exercise[index + 1:]
+        if infix_exercise[index] == '-' and (index == 0 or not str.isdigit(infix_exercise[index - 1])):
+            # A is a unary minus which as ~ before and B is unary minus without
+            if index != 0 and infix_exercise[index - 1] == '~' or infix_exercise[index - 1] == 'A' \
+                    or infix_exercise[index - 1] == '(':
+                infix_exercise = infix_exercise[:index] + 'A' + infix_exercise[index + 1:]
+            else:
+                infix_exercise = infix_exercise[:index] + 'B' + infix_exercise[index + 1:]
 
         # the treatment of ~ is different because it is the only one infix operator
         if infix_exercise[index] == '~':
@@ -89,16 +95,17 @@ class InfixToPostfix:
         # the treatment of brackets is different because it always in the first priority
         if infix_exercise[index] == ')':
             while operators[-1] != '(':
+                operators = InfixToPostfix._return_the_unary_minus(operators)
                 postfix_exercise.append(operators.pop())
             operators.pop()
 
         else:
             while len(operators) != 0 and len(postfix_exercise) != 0 and \
                     InfixToPostfix._stronger_operator(operators[-1], infix_exercise[index]):
+                operators = InfixToPostfix._return_the_unary_minus(operators)
                 postfix_exercise.append(operators.pop())
             operators.append(infix_exercise[index])
         index += 1
-
         return infix_exercise, postfix_exercise, operators, index
 
     @staticmethod
@@ -132,8 +139,25 @@ class InfixToPostfix:
         if operator1 == '(' or operator2 == '(':
             return False
 
-        # because it can repeat several times one after the other
-        if operator1 == 'U':
+        # because unary minus can repeat several times one after the other
+        if operator1 == 'B':
             return True if OPERATORS_PRIORITY_DICT[operator1] > OPERATORS_PRIORITY_DICT[operator2] else False
 
+        # '~' is making the 'unary -' being in the first priority anytime
+        if operator1 == 'A':
+            return False
+
         return True if OPERATORS_PRIORITY_DICT[operator1] >= OPERATORS_PRIORITY_DICT[operator2] else False
+
+    @staticmethod
+    def _return_the_unary_minus(operators: list) -> list:
+        """
+        This function gets a list and checks if the last operator in the list is a unary minus representation (A or B).
+        If it is its return it to the regular representation - 'U'.
+        :param operators: a list of the operators in char
+        :return: the list with the operators
+        """
+        # I put the Unary minus in the correct place, so now I can calculate it without separating the types
+        if operators[-1] == 'A' or operators[-1] == 'B':
+            operators[-1] = 'U'
+        return operators
