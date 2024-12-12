@@ -5,7 +5,7 @@ OPERATORS_PRIORITY_DICT = {MathOperators.ADD.value: 1, MathOperators.SUB.value: 
                            MathOperators.DIV.value: 2, MathOperators.POW.value: 3, MathOperators.AVG.value: 5,
                            MathOperators.MAX.value: 5, MathOperators.MIN.value: 5, MathOperators.MODULO.value: 4,
                            MathOperators.NEG.value: 6, MathOperators.FACTORIAL.value: 6,
-                           MathOperators.UNARY_MINUS_REGULAR.value: 2.5, MathOperators.UNARY_MINUS_AFTER_NEG.value: 10}
+                           MathOperators.UNARY_MINUS.value: 2.5}
 
 
 class InfixToPostfix:
@@ -31,8 +31,7 @@ class InfixToPostfix:
         while index != len(infix_exercise):
             # operand
             if str.isdigit(infix_exercise[index]):
-                infix_exercise, postfix_exercise, index = \
-                    InfixToPostfix._operand_handling(infix_exercise, postfix_exercise, index)
+                postfix_exercise, index = InfixToPostfix._operand_handling(infix_exercise, postfix_exercise, index)
 
             # operator
             else:
@@ -41,19 +40,19 @@ class InfixToPostfix:
 
         # add the operators that are left
         while len(operators) != 0:
-            operators = InfixToPostfix._return_the_unary_minus(operators)
             postfix_exercise.append(operators.pop(len(operators) - 1))
-
         return postfix_exercise
 
     @staticmethod
-    def _operand_handling(infix_exercise: str, postfix_exercise: list, index: int) -> str and list and int:
+    def _operand_handling(infix_exercise: str, postfix_exercise: list, index: int,
+                          flag: bool = False) -> list and int:
         """
         This class gets a string of infix expression, a list of the postfix expression and an index which
         point on the start of the number. The class adds the full number (can be floated) to the postfix list.
         :param infix_exercise: a string which is an infix expression
         :param postfix_exercise: a list which handled part of the postfix expression of the infix_exercise
         :param index: the start index of the operand we are going on right now
+        :param flag: boolean parameter that signs if the number is negative number according to the unary minuses
         :return: all the updated variables
         """
         start_of_number_index = index
@@ -61,9 +60,16 @@ class InfixToPostfix:
                 str.isdigit(infix_exercise[index + 1]) or infix_exercise[index + 1] == '.'):
             index += 1
 
-        postfix_exercise.append(float(infix_exercise[start_of_number_index:index + 1]))
+        # negative number
+        if flag:
+            postfix_exercise.append(-float(infix_exercise[start_of_number_index:index + 1]))
+
+        # positive number
+        else:
+            postfix_exercise.append(float(infix_exercise[start_of_number_index:index + 1]))
+
         index += 1
-        return infix_exercise, postfix_exercise, index
+        return postfix_exercise, index
 
     @staticmethod
     def _operator_handling(infix_exercise: str, postfix_exercise: list, operators: list,
@@ -78,38 +84,33 @@ class InfixToPostfix:
         :param index: the start index of the operand we are going on right now
         :return: all the updated variables
         """
-        # checking if it is a unary-minus and replace it to my custom char if its necessary
-        if infix_exercise[index] == '-' and (index == 0 or not str.isdigit(infix_exercise[index - 1])):
-            # A is a unary minus which as ~ before and B is unary minus without
-            if index != 0 and infix_exercise[index - 1] == '~' or infix_exercise[index - 1] == 'A' \
-                    or infix_exercise[index - 1] == '(':
-                infix_exercise = infix_exercise[:index] + 'A' + infix_exercise[index + 1:]
-            else:
-                infix_exercise = infix_exercise[:index] + 'B' + infix_exercise[index + 1:]
-
-        # the treatment of ~ is different because it is the only one infix operator
-        if infix_exercise[index] == '~':
-            infix_exercise, postfix_exercise = \
-                InfixToPostfix._negative_handling(infix_exercise, postfix_exercise, index)
-
         # the treatment of brackets is different because it always in the first priority
         if infix_exercise[index] == ')':
             while operators[-1] != '(':
-                operators = InfixToPostfix._return_the_unary_minus(operators)
                 postfix_exercise.append(operators.pop())
             operators.pop()
+            index += 1
+            return infix_exercise, postfix_exercise, operators, index
 
-        else:
-            while len(operators) != 0 and len(postfix_exercise) != 0 and \
-                    InfixToPostfix._stronger_operator(operators[-1], infix_exercise[index]):
-                operators = InfixToPostfix._return_the_unary_minus(operators)
-                postfix_exercise.append(operators.pop())
-            operators.append(infix_exercise[index])
+        # checking if it is a unary-minus and replace it to my custom char if its necessary
+        if infix_exercise[index] == '-' and (index == 0 or not str.isdigit(infix_exercise[index - 1])):
+            # checks if it is a unary minus which after an operator or not
+            if index == 0 or infix_exercise[index - 1] == '(' or infix_exercise[index - 1] == 'U':
+                infix_exercise = infix_exercise[:index] + 'U' + infix_exercise[index + 1:]
+            else:
+                postfix_exercise, index = InfixToPostfix._strong_unary_minus(infix_exercise, postfix_exercise,index)
+                # in this situation we already handled the operator (unary-minus) so we can go back
+                return infix_exercise, postfix_exercise, operators, index
+
+        while len(operators) != 0 and len(postfix_exercise) != 0 and \
+                InfixToPostfix._stronger_operator(operators[-1], infix_exercise[index]):
+            postfix_exercise.append(operators.pop())
+        operators.append(infix_exercise[index])
         index += 1
         return infix_exercise, postfix_exercise, operators, index
 
     @staticmethod
-    def _negative_handling(infix_exercise: str, postfix_exercise: list,index: int) -> str and list:
+    def _negative_handling(infix_exercise: str, postfix_exercise: list, index: int) -> str and list:
         """
         This func gets an infix expression which starts with ~ and handling this ~ operator.
         Negative operator is the only infix operator, so we have to handle it differently.
@@ -121,7 +122,7 @@ class InfixToPostfix:
         index += 1
         while not str.isdigit(infix_exercise[index]):
             index += 1
-        infix_exercise, postfix_exercise, end_of_num = InfixToPostfix._operand_handling(infix_exercise, postfix_exercise, index)
+        postfix_exercise, end_of_num = InfixToPostfix._operand_handling(infix_exercise, postfix_exercise, index)
 
         # removing the number from the expression
         infix_exercise = infix_exercise[:index] + infix_exercise[end_of_num:]
@@ -140,24 +141,34 @@ class InfixToPostfix:
             return False
 
         # because unary minus can repeat several times one after the other
-        if operator1 == 'B':
+        if operator1 == 'U':
             return True if OPERATORS_PRIORITY_DICT[operator1] > OPERATORS_PRIORITY_DICT[operator2] else False
-
-        # '~' is making the 'unary -' being in the first priority anytime
-        if operator1 == 'A':
-            return False
 
         return True if OPERATORS_PRIORITY_DICT[operator1] >= OPERATORS_PRIORITY_DICT[operator2] else False
 
     @staticmethod
-    def _return_the_unary_minus(operators: list) -> list:
+    def _strong_unary_minus(infix_exercise: str, postfix_exercise: list, index: int) -> list and int:
         """
-        This function gets a list and checks if the last operator in the list is a unary minus representation (A or B).
-        If it is its return it to the regular representation - 'U'.
-        :param operators: a list of the operators in char
-        :return: the list with the operators
-        """
-        # I put the Unary minus in the correct place, so now I can calculate it without separating the types
-        if operators[-1] == 'A' or operators[-1] == 'B':
-            operators[-1] = 'U'
-        return operators
+       This func gets an infix expression, index in it and postfix expression. The index is the start of a number
+       which starts with unary minus, it has to count the minuses and check if the number is positive or negative
+       according to the minuses. The function returns the updated postfix expression with the number,
+       and the first index after the number end.
+       :param infix_exercise:   infix expression
+       :param postfix_exercise: postfix expression
+       :return: updated valuables
+       """
+        counter = 0
+        while infix_exercise[index] == '-' and index != len(infix_exercise):
+            counter += 1
+            index += 1
+
+        if index == len(infix_exercise):
+            # raise exception
+            print("frf")
+
+        # positive number
+        if counter % 2 == 0:
+            return InfixToPostfix._operand_handling(infix_exercise, postfix_exercise, index)
+
+        # negative number
+        return InfixToPostfix._operand_handling(infix_exercise, postfix_exercise, index, True)
