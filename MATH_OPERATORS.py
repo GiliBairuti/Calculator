@@ -14,3 +14,4 @@ class MathOperators(Enum):
     NEG = '~'
     FACTORIAL = '!'
     UNARY_MINUS = 'U'
+    SUM_DIGIT = '#'

@@ -5,7 +5,7 @@ OPERATORS_PRIORITY_DICT = {MathOperators.ADD.value: 1, MathOperators.SUB.value: 
                            MathOperators.DIV.value: 2, MathOperators.POW.value: 3, MathOperators.AVG.value: 5,
                            MathOperators.MAX.value: 5, MathOperators.MIN.value: 5, MathOperators.MODULO.value: 4,
                            MathOperators.NEG.value: 6, MathOperators.FACTORIAL.value: 6,
-                           MathOperators.UNARY_MINUS.value: 2.5}
+                           MathOperators.UNARY_MINUS.value: 2.5, MathOperators.SUM_DIGIT.value: 6}
 
 
 class InfixToPostfix:
@@ -93,7 +93,7 @@ class InfixToPostfix:
             return infix_exercise, postfix_exercise, operators, index
 
         # checking if it is a unary-minus and replace it to my custom char if its necessary
-        if infix_exercise[index] == '-' and (index == 0 or not str.isdigit(infix_exercise[index - 1])):
+        if infix_exercise[index] == '-' and (index == 0 or infix_exercise[index-1] in OPERATORS_PRIORITY_DICT):
             # checks if it is a unary minus which after an operator or not
             if index == 0 or infix_exercise[index - 1] == '(' or infix_exercise[index - 1] == 'U':
                 infix_exercise = infix_exercise[:index] + 'U' + infix_exercise[index + 1:]

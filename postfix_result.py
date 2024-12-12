@@ -5,11 +5,12 @@ CLASS_DICT = {MathOperators.ADD.value: Add, MathOperators.SUB.value: Sub, MathOp
               MathOperators.DIV.value: Div, MathOperators.POW.value: Power, MathOperators.AVG.value: Average,
               MathOperators.MAX.value: Maximum, MathOperators.MIN.value: Minimum, MathOperators.MODULO.value: Modulo,
               MathOperators.NEG.value: Negative, MathOperators.FACTORIAL.value: Factorial,
-              MathOperators.UNARY_MINUS.value: Negative}
+              MathOperators.UNARY_MINUS.value: Negative, MathOperators.SUM_DIGIT.value: SumDigits}
 
 OPERATORS = set(operator.value for operator in MathOperators)
 
-UNARY_FUNCS = [MathOperators.FACTORIAL.value, MathOperators.NEG.value, MathOperators.UNARY_MINUS.value]
+UNARY_FUNCS = [MathOperators.FACTORIAL.value, MathOperators.NEG.value,
+               MathOperators.UNARY_MINUS.value, MathOperators.SUM_DIGIT.value]
 
 
 class GoingOverTheExercise:
@@ -25,6 +26,7 @@ class GoingOverTheExercise:
         :param postfix_exercise: a list which holds a postfix expression
         :return: a float number which is the result of the expression
         """
+        print(postfix_exercise)
         result = 0
         index = 0
         while len(postfix_exercise) != 1:
