@@ -20,13 +20,13 @@ class GoingOverTheExercise:
     """
 
     @staticmethod
-    def postfix_to_result(postfix_exercise: list) -> float:
+    def postfix_to_result(postfix_exercise: list) -> float or Exception:
         """
-        This function is getting a postfix expression and return its result
+        This function is getting a postfix expression and return its result, if there is a mathematical problem it
+        returns a specific exception with the problem.
         :param postfix_exercise: a list which holds a postfix expression
-        :return: a float number which is the result of the expression
+        :return: a float number which is the result of the expression or an exception
         """
-        print(postfix_exercise)
         result = 0
         index = 0
         while len(postfix_exercise) != 1:
@@ -37,7 +37,6 @@ class GoingOverTheExercise:
                     index -= 1
 
                     result = CLASS_DICT[func].resolve(arg)
-                    postfix_exercise.insert(index, result)
 
                 else:
                     func = postfix_exercise.pop(index)
@@ -46,7 +45,10 @@ class GoingOverTheExercise:
                     index -= 2
 
                     result = CLASS_DICT[func].resolve(arg1, arg2)
-                    postfix_exercise.insert(index, result)
+
+                if isinstance(result, Exception):   # checks if an exception was found
+                    return result
+                postfix_exercise.insert(index, result)
 
             index += 1
 

@@ -1,6 +1,7 @@
 from MATH_OPERATORS import MathOperators
 from exceptions import OperatorAtFirstException, OperatorAfterOperatorException, WrongNegativeOperatorPlaceException, \
-    WrongUnaryMinusException, EmptyEquationException, ImpossibleNumberException, UnknownCharException
+    WrongUnaryMinusException, EmptyEquationException, ImpossibleNumberException, \
+    UnknownCharException, BracketsWithoutEndOrStartException
 
 # I chose to call 'U' as unary-minus
 OPERATORS_PRIORITY_DICT = {MathOperators.ADD.value: 1, MathOperators.SUB.value: 1, MathOperators.MUL.value: 2,
@@ -18,12 +19,12 @@ class InfixToPostfix:
     """
 
     @staticmethod
-    def infix_to_postfix(infix_exercise: str) -> list:
+    def infix_to_postfix(infix_exercise: str) -> list or dict:
         """
         This function gets a string which is a math exercise in infix,
-        and change it into a list of the numbers and the chars of the operators in a list ordered in postfix
+        and change it into a list of the numbers and the chars of the operators in a list ordered in postfix.
         :param infix_exercise: holding a string which represents a mathematical infix expression
-        :return: list which includes the same math exercise but in postfix
+        :return: list which includes the same math exercise but in postfix or exceptions dictionary
         """
         # remove the meaningless spaces
         infix_exercise = infix_exercise.replace(' ', '')
@@ -42,11 +43,15 @@ class InfixToPostfix:
                 infix_exercise, postfix_exercise, operators, index = \
                     InfixToPostfix._operator_handling(infix_exercise, postfix_exercise, operators, index)
 
+        bracket_index = -1
         # add the operators that are left
         while len(operators) != 0:
+            if operators[-1] == '(':  # there is an opening bracket without closing
+                bracket_index = infix_exercise.index('(', bracket_index + 1, len(infix_exercise))
+                InfixToPostfix.adding_exception(BracketsWithoutEndOrStartException, bracket_index, bracket_index + 1)
             postfix_exercise.append(operators.pop(len(operators) - 1))
 
-        if len(EXCEPTIONS_DICT) != 0:   # there are exceptions in this part
+        if len(EXCEPTIONS_DICT) != 0:  # there are exceptions in this part
             return EXCEPTIONS_DICT
 
         return postfix_exercise
@@ -66,27 +71,29 @@ class InfixToPostfix:
         start_of_number_index = index
         decimal_point = False
         is_exception = False
-        while (index + 1 != len(infix_exercise)) and (str.isdigit(infix_exercise[index + 1]) or (infix_exercise[index + 1] == '.')):
+        while (index + 1 != len(infix_exercise)) and (
+                str.isdigit(infix_exercise[index + 1]) or (infix_exercise[index + 1] == '.')):
             if infix_exercise[index + 1] == '.':
-                if decimal_point is True:   # this number has or more decimal points
+                if decimal_point is True:  # this number has or more decimal points
                     is_exception = True
                 decimal_point = True
             index += 1
 
+        index += 1
+
         # the number isn't logic - has more than one decimal point
         if is_exception:
-            EXCEPTIONS_DICT[ImpossibleNumberException] = start_of_number_index, index + 1
+            InfixToPostfix.adding_exception(ImpossibleNumberException, start_of_number_index, index)
 
         else:
             # negative number
             if flag:
-                postfix_exercise.append(-float(infix_exercise[start_of_number_index: + 1]))
+                postfix_exercise.append(-float(infix_exercise[start_of_number_index:index]))
 
             # positive number
             else:
-                postfix_exercise.append(float(infix_exercise[start_of_number_index:index + 1]))
+                postfix_exercise.append(float(infix_exercise[start_of_number_index:index]))
 
-        index += 1
         return postfix_exercise, index
 
     @staticmethod
@@ -104,14 +111,17 @@ class InfixToPostfix:
         """
         # the treatment of brackets is different because it always in the first priority
         if infix_exercise[index] == ')':
-            while operators[-1] != '(':
+            while len(operators) != 0 and operators[-1] != '(':
                 postfix_exercise.append(operators.pop())
-            operators.pop()
+            if len(operators) == 0:
+                InfixToPostfix.adding_exception(BracketsWithoutEndOrStartException, index, index + 1)
+            else:
+                operators.pop()
             index += 1
             return infix_exercise, postfix_exercise, operators, index
 
         # checking if it is a unary-minus and replace it to my custom char if its necessary
-        if infix_exercise[index] == '-' and (index == 0 or infix_exercise[index - 1] in OPERATORS_PRIORITY_DICT):
+        if infix_exercise[index] == '-' and (index == 0 or not str.isdigit(infix_exercise[index - 1])):
             # checks if it is a unary minus which after an operator or not
             if index == 0 or infix_exercise[index - 1] == '(' or infix_exercise[index - 1] == 'U':
                 infix_exercise = infix_exercise[:index] + 'U' + infix_exercise[index + 1:]
@@ -190,3 +200,17 @@ class InfixToPostfix:
 
         # negative number
         return InfixToPostfix._operand_handling(infix_exercise, postfix_exercise, index, True)
+
+    @staticmethod
+    def adding_exception(exception_key: Exception, start_index: int, end_index: int):
+        """
+        This function is getting an exception and add it to the exception's dictionary, if there is already this type
+        of exception it adds the new one and keeps the previous exceptions.
+        :param exception_key: the name of the exception
+        :param start_index: the starting index of the problem
+        :param end_index: the end index of the problem
+        """
+        if exception_key in EXCEPTIONS_DICT:  # checks if we already have this exception, to not override it.
+            EXCEPTIONS_DICT[exception_key].append((start_index, end_index))
+        else:
+            EXCEPTIONS_DICT[exception_key] = [(start_index, end_index)]

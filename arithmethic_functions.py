@@ -1,6 +1,6 @@
 from math_interface import ArithmeticFuncs
 from math import pow
-from exceptions import NegativeOperandException, DivisionByZeroException
+from exceptions import NegativeOperandException, DivisionByZeroException, FloatFactorialException
 
 
 class Add(ArithmeticFuncs):
@@ -42,7 +42,7 @@ class Div(ArithmeticFuncs):
     @staticmethod
     def resolve(arg1: float, arg2: float) -> float or Exception:
         if arg2 == 0:
-            raise DivisionByZeroException()
+            return DivisionByZeroException(arg1)
         return arg1 / arg2
 
 
@@ -115,7 +115,10 @@ class Factorial(ArithmeticFuncs):
     @staticmethod
     def resolve(arg: float) -> float or Exception:
         if arg < 0:
-            raise NegativeOperandException('!', arg)
+            return NegativeOperandException('!', arg)
+        if arg % 1 != 0:
+            return FloatFactorialException(arg)
+
         if arg == 0:
             return 1
         return arg * Factorial.resolve(arg - 1)
@@ -128,9 +131,9 @@ class SumDigits(ArithmeticFuncs):
     """
 
     @staticmethod
-    def resolve(arg: float) -> float or Exception:
+    def resolve(arg: int) -> int or Exception:
         if arg < 0:
-            raise NegativeOperandException('#', arg)
+            return NegativeOperandException('#', arg)
 
         num = str(arg)
         summary = 0
