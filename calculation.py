@@ -9,7 +9,9 @@ class Calculation(Calculator):
     while refer to the priority of the operators and checking the validity of the input
     """
     @staticmethod
-    def calculation_answer(infix_exercise: str) -> list:
+    def calculation_answer(infix_exercise: str) -> list or dict:
         postfix_exercise = InfixToPostfix.infix_to_postfix(infix_exercise)
+        if type(postfix_exercise) is dict:  # exceptions were found in the infix to postfix part
+            return postfix_exercise    # exceptions dict
         return GoingOverTheExercise.postfix_to_result(postfix_exercise)
 

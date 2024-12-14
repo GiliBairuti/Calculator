@@ -1,5 +1,6 @@
 from math_interface import ArithmeticFuncs
 from math import pow
+from exceptions import NegativeOperandException, DivisionByZeroException
 
 
 class Add(ArithmeticFuncs):
@@ -8,7 +9,7 @@ class Add(ArithmeticFuncs):
     """
 
     @staticmethod
-    def resolve(arg1: float, arg2: float = 0) -> float:
+    def resolve(arg1: float, arg2: float) -> float:
         return arg1 + arg2
 
 
@@ -18,7 +19,7 @@ class Sub(ArithmeticFuncs):
     """
 
     @staticmethod
-    def resolve(arg1: float, arg2: float = 0) -> float:
+    def resolve(arg1: float, arg2: float) -> float:
         return arg1 - arg2
 
 
@@ -28,17 +29,20 @@ class Mul(ArithmeticFuncs):
     """
 
     @staticmethod
-    def resolve(arg1: float, arg2: float = 0) -> float:
+    def resolve(arg1: float, arg2: float) -> float:
         return arg1 * arg2
 
 
 class Div(ArithmeticFuncs):
     """
-    Division method between two numbers -- first number divided by the second
+    Division method between two numbers -- first number divided by the second.
+    If the second argument is negative it raises an exception because we cannot divide by zero.
     """
 
     @staticmethod
-    def resolve(arg1: float, arg2: float = 0) -> float:
+    def resolve(arg1: float, arg2: float) -> float or Exception:
+        if arg2 == 0:
+            raise DivisionByZeroException()
         return arg1 / arg2
 
 
@@ -48,7 +52,7 @@ class Power(ArithmeticFuncs):
     """
 
     @staticmethod
-    def resolve(arg1: float, arg2: float = 0) -> float:
+    def resolve(arg1: float, arg2: float) -> float:
         return pow(arg1, arg2)
 
 
@@ -58,7 +62,7 @@ class Average(ArithmeticFuncs):
     """
 
     @staticmethod
-    def resolve(arg1: float, arg2: float = 0) -> float:
+    def resolve(arg1: float, arg2: float) -> float:
         return (arg1 + arg2) / 2
 
 
@@ -68,7 +72,7 @@ class Maximum(ArithmeticFuncs):
     """
 
     @staticmethod
-    def resolve(arg1: float, arg2: float = 0) -> float:
+    def resolve(arg1: float, arg2: float) -> float:
         return arg1 if arg1 > arg2 else arg2
 
 
@@ -78,7 +82,7 @@ class Minimum(ArithmeticFuncs):
     """
 
     @staticmethod
-    def resolve(arg1: float, arg2: float = 0) -> float:
+    def resolve(arg1: float, arg2: float) -> float:
         return arg1 if arg1 < arg2 else arg2
 
 
@@ -88,7 +92,7 @@ class Modulo(ArithmeticFuncs):
     """
 
     @staticmethod
-    def resolve(arg1: float, arg2: float = 0) -> float:
+    def resolve(arg1: float, arg2: float) -> float:
         return arg1 % arg2
 
 
@@ -104,11 +108,14 @@ class Negative(ArithmeticFuncs):
 
 class Factorial(ArithmeticFuncs):
     """
-    Returns the factorial of the number
+    Returns the factorial of the number.
+    If the number is negative it raises an exception.
     """
 
     @staticmethod
-    def resolve(arg: float) -> float:
+    def resolve(arg: float) -> float or Exception:
+        if arg < 0:
+            raise NegativeOperandException('!', arg)
         if arg == 0:
             return 1
         return arg * Factorial.resolve(arg - 1)
@@ -116,11 +123,15 @@ class Factorial(ArithmeticFuncs):
 
 class SumDigits(ArithmeticFuncs):
     """
-    Returns the sum of the digits of a number
+    Returns the sum of the digits of a number.
+    If the number is negative it raises an exception because this operator cannot handle negative numbers.
     """
 
     @staticmethod
-    def resolve(arg: float) -> float:
+    def resolve(arg: float) -> float or Exception:
+        if arg < 0:
+            raise NegativeOperandException('#', arg)
+
         num = str(arg)
         summary = 0
         for dig in num:

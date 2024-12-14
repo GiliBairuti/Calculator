@@ -1,4 +1,6 @@
 from MATH_OPERATORS import MathOperators
+from exceptions import OperatorAtFirstException, OperatorAfterOperatorException, WrongNegativeOperatorPlaceException, \
+    WrongUnaryMinusException, EmptyEquationException, ImpossibleNumberException, UnknownCharException
 
 # I chose to call 'U' as unary-minus
 OPERATORS_PRIORITY_DICT = {MathOperators.ADD.value: 1, MathOperators.SUB.value: 1, MathOperators.MUL.value: 2,
@@ -6,6 +8,8 @@ OPERATORS_PRIORITY_DICT = {MathOperators.ADD.value: 1, MathOperators.SUB.value: 
                            MathOperators.MAX.value: 5, MathOperators.MIN.value: 5, MathOperators.MODULO.value: 4,
                            MathOperators.NEG.value: 6, MathOperators.FACTORIAL.value: 6,
                            MathOperators.UNARY_MINUS.value: 2.5, MathOperators.SUM_DIGIT.value: 6}
+
+EXCEPTIONS_DICT = dict()
 
 
 class InfixToPostfix:
@@ -41,6 +45,10 @@ class InfixToPostfix:
         # add the operators that are left
         while len(operators) != 0:
             postfix_exercise.append(operators.pop(len(operators) - 1))
+
+        if len(EXCEPTIONS_DICT) != 0:   # there are exceptions in this part
+            return EXCEPTIONS_DICT
+
         return postfix_exercise
 
     @staticmethod
@@ -56,17 +64,27 @@ class InfixToPostfix:
         :return: all the updated variables
         """
         start_of_number_index = index
-        while index + 1 != len(infix_exercise) and (
-                str.isdigit(infix_exercise[index + 1]) or infix_exercise[index + 1] == '.'):
+        decimal_point = False
+        is_exception = False
+        while (index + 1 != len(infix_exercise)) and (str.isdigit(infix_exercise[index + 1]) or (infix_exercise[index + 1] == '.')):
+            if infix_exercise[index + 1] == '.':
+                if decimal_point is True:   # this number has or more decimal points
+                    is_exception = True
+                decimal_point = True
             index += 1
 
-        # negative number
-        if flag:
-            postfix_exercise.append(-float(infix_exercise[start_of_number_index:index + 1]))
+        # the number isn't logic - has more than one decimal point
+        if is_exception:
+            EXCEPTIONS_DICT[ImpossibleNumberException] = start_of_number_index, index + 1
 
-        # positive number
         else:
-            postfix_exercise.append(float(infix_exercise[start_of_number_index:index + 1]))
+            # negative number
+            if flag:
+                postfix_exercise.append(-float(infix_exercise[start_of_number_index: + 1]))
+
+            # positive number
+            else:
+                postfix_exercise.append(float(infix_exercise[start_of_number_index:index + 1]))
 
         index += 1
         return postfix_exercise, index
@@ -93,12 +111,12 @@ class InfixToPostfix:
             return infix_exercise, postfix_exercise, operators, index
 
         # checking if it is a unary-minus and replace it to my custom char if its necessary
-        if infix_exercise[index] == '-' and (index == 0 or infix_exercise[index-1] in OPERATORS_PRIORITY_DICT):
+        if infix_exercise[index] == '-' and (index == 0 or infix_exercise[index - 1] in OPERATORS_PRIORITY_DICT):
             # checks if it is a unary minus which after an operator or not
             if index == 0 or infix_exercise[index - 1] == '(' or infix_exercise[index - 1] == 'U':
                 infix_exercise = infix_exercise[:index] + 'U' + infix_exercise[index + 1:]
             else:
-                postfix_exercise, index = InfixToPostfix._strong_unary_minus(infix_exercise, postfix_exercise,index)
+                postfix_exercise, index = InfixToPostfix._strong_unary_minus(infix_exercise, postfix_exercise, index)
                 # in this situation we already handled the operator (unary-minus) so we can go back
                 return infix_exercise, postfix_exercise, operators, index
 
