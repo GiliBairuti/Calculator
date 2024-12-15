@@ -7,7 +7,7 @@ def format_number(num: float) -> str:
     """
     if num % 1 == 0:
         return f"{int(num)}"
-    return f"{num:.4}"
+    return f"{num}"
 
 
 class NegativeOperandException(Exception):
@@ -45,7 +45,7 @@ class ImpossibleNumberException(Exception):
         super().__init__()
 
     def __str__(self):
-        return "The number you chose isn't possible because it has 2 or more decimal points."
+        return "The number you chose isn't possible because it has 2 or more decimal points"
 
 
 class WrongUnaryMinusException(Exception):
@@ -53,7 +53,7 @@ class WrongUnaryMinusException(Exception):
         super().__init__()
 
     def __str__(self):
-        return "Unary minus can only appear before a number."
+        return "Unary minus can only appear before a number"
 
 
 class EmptyEquationException(Exception):
@@ -69,33 +69,31 @@ class UnknownCharException(Exception):
         super().__init__()
 
     def __str__(self):
-        return "You used an unsupported char."
+        return "You used an unsupported char"
 
 
 class OperatorAfterOperatorException(Exception):
-    def __init__(self, operator):
-        self._operator = operator
-        super().__init__(self._operator)
-
-    def __str__(self):
-        return "The %s operator cannot appear after other operator." % self._operator
-
-
-class OperatorAtFirstException(Exception):
-    def __init__(self, operator):
-        self._operator = operator
-        super().__init__(self._operator)
-
-    def __str__(self):
-        return "The %s operator cannot appear at the start of the equation." % self._operator
-
-
-class WrongNegativeOperatorPlaceException(Exception):
     def __init__(self):
         super().__init__()
 
     def __str__(self):
-        return f"The ~ operator can appear only before a number (or signed minus)."
+        return f"Operator cannot appear after an operator unless it is a prefix operator"
+
+
+class OperatorAtFirstException(Exception):
+    def __init__(self):
+        super().__init__()
+
+    def __str__(self):
+        return "Every equation has to start with a number or prefix operator"
+
+
+class OperatorAtLastException(Exception):
+    def __init__(self):
+        super().__init__()
+
+    def __str__(self):
+        return "Every equation has to end with a number or postfix operator"
 
 
 class BracketsWithoutEndOrStartException(Exception):
@@ -103,5 +101,12 @@ class BracketsWithoutEndOrStartException(Exception):
         super().__init__()
 
     def __str__(self):
-        return f"In math every opening bracket must also have a closing bracket."
-    
+        return f"In math every opening bracket must also have a closing bracket"
+
+
+class WrongBracketsPlaceException(Exception):
+    def __init__(self):
+        super().__init__()
+
+    def __str__(self):
+        return f"Opening and closing brackets can appear only after and before operators (similar to operands)"

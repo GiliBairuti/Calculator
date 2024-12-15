@@ -1,12 +1,12 @@
-from calculation import *
+from calculation import Calculation
 from colorama import Fore, Style
 
 
 def main():
-    exercise = "(-6+6))"
+    exercise = "~+3"
     result = Calculation.calculation_answer(exercise)
-    if type(result) is float or type(result) is int:
-        print(f"{exercise} = {Calculation.calculation_answer(exercise):.4}")
+    if type(result) is float:
+        print(f"{exercise} = {Calculation.calculation_answer(exercise)}")
 
     else:
         exercise = exercise.replace(" ", "")
