@@ -1,6 +1,6 @@
 from MATH_OPERATORS import MathOperators
 from exceptions import OperatorAtFirstException, OperatorAfterOperatorException, ImpossibleNumberException, \
-    UnknownCharException, BracketsWithoutEndOrStartException, OperatorAtLastException, WrongBracketsPlaceException,\
+    UnknownCharException, BracketsWithoutEndOrStartException, OperatorAtLastException, WrongBracketsPlaceException, \
     EmptyBracketsException, NegativeOperatorException, UnaryMinusPlaceException, DecimalPointException
 
 # I chose to call 'U' as unary-minus
@@ -31,6 +31,8 @@ class InfixToPostfix:
         :param infix_exercise: holding a string which represents a mathematical infix expression
         :return: list which includes the same math exercise but in postfix or exceptions dictionary
         """
+        # clear the exceptions from the last equation
+        EXCEPTIONS_DICT.clear()
         # remove the meaningless spaces
         infix_exercise = infix_exercise.replace(' ', '')
 
@@ -147,16 +149,18 @@ class InfixToPostfix:
                 (index == 0 or infix_exercise[index - 1] in OPERATORS or infix_exercise[
                     index - 1] == '('):
             # checks if it is a unary minus which appears at the start of an expression or a sign minus
-            if index == 0 or infix_exercise[index - 1] == '(' or infix_exercise[index - 1] == MathOperators.UNARY_MINUS.value:
+            if index == 0 or infix_exercise[index - 1] == '(' or infix_exercise[
+                index - 1] == MathOperators.UNARY_MINUS.value:
                 infix_exercise = infix_exercise[:index] + MathOperators.UNARY_MINUS.value + infix_exercise[index + 1:]
-                if index + 1 != len(infix_exercise) and not (str.isdigit(infix_exercise[index + 1]) or infix_exercise[index + 1] == MathOperators.SUB.value):
+                if index + 1 != len(infix_exercise) and not (
+                        str.isdigit(infix_exercise[index + 1]) or infix_exercise[index + 1] == MathOperators.SUB.value):
                     InfixToPostfix.adding_exception(UnaryMinusPlaceException, index, index + 1)
             else:
                 post = False
                 if infix_exercise[index - 1] in POSTFIX_OPERATORS:
                     postfix_exercise.append(operators.pop())
                     post = True
-                index = InfixToPostfix._strong_unary_minus(infix_exercise, postfix_exercise, index, operators)
+                index = InfixToPostfix._strong_unary_minus(infix_exercise, index, operators)
 
                 if post:  # if the operator before the unary minus is a postfix operator than we have to add +
                     postfix_exercise.append(MathOperators.ADD.value)
@@ -173,8 +177,7 @@ class InfixToPostfix:
             InfixToPostfix.adding_exception(NegativeOperatorException, index, index + 1)
 
         # operator cannot appear after an operator unless the second one is a prefix operator
-        if index != 0 and not str.isdigit(infix_exercise[index - 1]) and infix_exercise[index] not in PREFIX_OPERATORS \
-                and infix_exercise[index - 1] != ')' and infix_exercise[index - 1] != '.':
+        if index != 0 and infix_exercise[index] not in PREFIX_OPERATORS and infix_exercise[index - 1] in OPERATORS:
             InfixToPostfix.adding_exception(OperatorAfterOperatorException, index - 1, index + 1)
 
         while len(operators) != 0 and len(postfix_exercise) != 0 and \
