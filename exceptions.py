@@ -40,20 +40,20 @@ class FloatFactorialException(Exception):
                f"{format_number(self._operand)}"
 
 
+class WrongPowException(Exception):
+    def __init__(self):
+        super().__init__()
+
+    def __str__(self):
+        return f"Pow cannot get an negative base and exponent between 0-1, because its like negative sqrt."
+
+
 class ImpossibleNumberException(Exception):
     def __init__(self):
         super().__init__()
 
     def __str__(self):
         return "The number you chose isn't possible because it has 2 or more decimal points"
-
-
-class WrongUnaryMinusException(Exception):
-    def __init__(self):
-        super().__init__()
-
-    def __str__(self):
-        return "Unary minus can only appear before a number"
 
 
 class EmptyEquationException(Exception):
@@ -96,6 +96,22 @@ class OperatorAtLastException(Exception):
         return "Every equation has to end with a number or postfix operator"
 
 
+class NegativeOperatorException(Exception):
+    def __init__(self):
+        super().__init__()
+
+    def __str__(self):
+        return "The ~ operator can appear only before numbers"
+
+
+class UnaryMinusPlaceException(Exception):
+    def __init__(self):
+        super().__init__()
+
+    def __str__(self):
+        return f"Unary minus can appear only before a number or additional unary minus"
+
+
 class BracketsWithoutEndOrStartException(Exception):
     def __init__(self):
         super().__init__()
@@ -110,3 +126,11 @@ class WrongBracketsPlaceException(Exception):
 
     def __str__(self):
         return f"Opening and closing brackets can appear only after and before operators (similar to operands)"
+
+
+class EmptyBracketsException(Exception):
+    def __init__(self):
+        super().__init__()
+
+    def __str__(self):
+        return f"Empty brackets aren't making sense... Put something in the brackets"

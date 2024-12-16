@@ -1,6 +1,6 @@
 from math_interface import ArithmeticFuncs
 from math import pow
-from exceptions import NegativeOperandException, DivisionByZeroException, FloatFactorialException
+from exceptions import NegativeOperandException, DivisionByZeroException, FloatFactorialException, WrongPowException
 
 
 class Add(ArithmeticFuncs):
@@ -53,6 +53,8 @@ class Power(ArithmeticFuncs):
 
     @staticmethod
     def resolve(arg1: float, arg2: float) -> float:
+        if arg1 < 0 and 0 < arg2 < 1:
+            return WrongPowException()
         return pow(arg1, arg2)
 
 

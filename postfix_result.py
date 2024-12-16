@@ -27,6 +27,10 @@ class GoingOverTheExercise:
         :param postfix_exercise: a list which holds a postfix expression
         :return: a float number which is the result of the expression or an exception
         """
+        # checks if got only a number
+        if len(postfix_exercise) == 1:
+            return postfix_exercise[0]
+
         result = 0
         index = 0
         while len(postfix_exercise) != 1:
