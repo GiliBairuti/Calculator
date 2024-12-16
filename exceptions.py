@@ -134,3 +134,11 @@ class EmptyBracketsException(Exception):
 
     def __str__(self):
         return f"Empty brackets aren't making sense... Put something in the brackets"
+
+
+class DecimalPointException(Exception):
+    def __init__(self):
+        super().__init__()
+
+    def __str__(self):
+        return f"Float numbers must contain digits before the decimal point"

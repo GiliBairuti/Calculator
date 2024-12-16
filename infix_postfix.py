@@ -1,7 +1,7 @@
 from MATH_OPERATORS import MathOperators
 from exceptions import OperatorAtFirstException, OperatorAfterOperatorException, ImpossibleNumberException, \
     UnknownCharException, BracketsWithoutEndOrStartException, OperatorAtLastException, WrongBracketsPlaceException,\
-    EmptyBracketsException, NegativeOperatorException, UnaryMinusPlaceException
+    EmptyBracketsException, NegativeOperatorException, UnaryMinusPlaceException, DecimalPointException
 
 # I chose to call 'U' as unary-minus
 OPERATORS_PRIORITY_DICT = {MathOperators.ADD.value: 1, MathOperators.SUB.value: 1, MathOperators.MUL.value: 2,
@@ -49,7 +49,11 @@ class InfixToPostfix:
                     index = InfixToPostfix._operator_handling(infix_exercise, postfix_exercise, operators, index)
 
                 else:
-                    InfixToPostfix.adding_exception(UnknownCharException, index, index + 1)
+                    if infix_exercise[index] == '.':
+                        InfixToPostfix.adding_exception(DecimalPointException, index, index + 1)
+
+                    else:
+                        InfixToPostfix.adding_exception(UnknownCharException, index, index + 1)
                     index += 1
 
         if not (str.isdigit(infix_exercise[-1]) or infix_exercise[-1] in POSTFIX_OPERATORS):
@@ -143,8 +147,8 @@ class InfixToPostfix:
                 (index == 0 or infix_exercise[index - 1] in OPERATORS or infix_exercise[
                     index - 1] == '('):
             # checks if it is a unary minus which appears at the start of an expression or a sign minus
-            if index == 0 or infix_exercise[index - 1] == '(' or infix_exercise[index - 1] == 'U':
-                infix_exercise = infix_exercise[:index] + 'U' + infix_exercise[index + 1:]
+            if index == 0 or infix_exercise[index - 1] == '(' or infix_exercise[index - 1] == MathOperators.UNARY_MINUS.value:
+                infix_exercise = infix_exercise[:index] + MathOperators.UNARY_MINUS.value + infix_exercise[index + 1:]
                 if index + 1 != len(infix_exercise) and not (str.isdigit(infix_exercise[index + 1]) or infix_exercise[index + 1] == MathOperators.SUB.value):
                     InfixToPostfix.adding_exception(UnaryMinusPlaceException, index, index + 1)
             else:
@@ -170,7 +174,7 @@ class InfixToPostfix:
 
         # operator cannot appear after an operator unless the second one is a prefix operator
         if index != 0 and not str.isdigit(infix_exercise[index - 1]) and infix_exercise[index] not in PREFIX_OPERATORS \
-                and infix_exercise[index - 1] != ')':
+                and infix_exercise[index - 1] != ')' and infix_exercise[index - 1] != '.':
             InfixToPostfix.adding_exception(OperatorAfterOperatorException, index - 1, index + 1)
 
         while len(operators) != 0 and len(postfix_exercise) != 0 and \
@@ -199,14 +203,12 @@ class InfixToPostfix:
         return True if OPERATORS_PRIORITY_DICT[operator1] >= OPERATORS_PRIORITY_DICT[operator2] else False
 
     @staticmethod
-    def _strong_unary_minus(infix_exercise: str, postfix_exercise: list, index: int, operators: list) -> int:
+    def _strong_unary_minus(infix_exercise: str, index: int, operators: list) -> int:
         """
-       This func gets an infix expression, index in it and postfix expression. The index is the start of a number
-       which starts with unary minus, it has to count the minuses and check if the number is positive or negative
-       according to the minuses. The function returns the updated postfix expression with the number,
-       and the first index after the number end.
+       This func gets an infix expression and an index. This index is the start of a number which starts with unary
+       minus, we have to count the minuses and check if the number is positive or negative
+       according to the minuses. The function returns the first index after the number ends.
        :param infix_exercise:   infix expression
-       :param postfix_exercise: postfix expression
        :param index: the index of the first unary minus
        :param operators: the left operators in the operators list of the algorithm
        :return: the updated index
@@ -223,7 +225,7 @@ class InfixToPostfix:
         else:
             # negative number
             if counter % 2 == 1:
-                operators.append('~')
+                operators.append(MathOperators.NEG.value)
 
         return index
 
