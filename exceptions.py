@@ -45,7 +45,7 @@ class WrongPowException(Exception):
         super().__init__()
 
     def __str__(self):
-        return f"Pow cannot get an negative base and exponent between 0-1, because its like negative sqrt."
+        return f"Pow cannot get an negative base and exponent between -1 and 1, because its like negative sqrt."
 
 
 class ImpossibleNumberException(Exception):

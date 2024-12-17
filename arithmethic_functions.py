@@ -5,7 +5,7 @@ from exceptions import NegativeOperandException, DivisionByZeroException, FloatF
 
 class Add(ArithmeticFuncs):
     """
-    adding method between two numbers
+    Addition method between two numbers
     """
 
     @staticmethod
@@ -53,7 +53,7 @@ class Power(ArithmeticFuncs):
 
     @staticmethod
     def resolve(arg1: float, arg2: float) -> float:
-        if arg1 < 0 and 0 < arg2 < 1:
+        if arg1 < 0 and -1 < arg2 < 1:
             return WrongPowException()
         return pow(arg1, arg2)
 

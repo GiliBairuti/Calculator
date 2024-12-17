@@ -22,7 +22,18 @@ class UI:
         """
         This function prints the deeper explanation about every function. This explanation appears when we enter "help".
         """
-        print('"+" - This function is ')
+        print(f'\n"+" - Addition operator.\n'
+              f'"-" - Subtraction operator.\n'
+              f'"/" - Division operator.\n'
+              f'"*" - Multiplication operator.\n'
+              f'"^" - Power operator between two numbers - x^y.\n'
+              f'"@" - Average between two numbers x@y.\n'
+              f'"$" - Maximum number between the two.\n'
+              f'"&" - Minimum number between the two.\n'
+              f'"%" - Modulo operator.\n'
+              f'"~" - Negative operator - gets a number and changes its sign.\n'
+              f'"!" - Factorial operator - x!.\n'
+              f'"#" - Summary digits operator - x#, gets a number and summary its digits.\n')
 
     @staticmethod
     def check_result(equation: str):
@@ -41,7 +52,6 @@ class UI:
                 print(result)
             else:
                 UI.print_exceptions(equation, result)
-
 
     @staticmethod
     def print_result(equation: str, result: float or int):

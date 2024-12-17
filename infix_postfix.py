@@ -135,6 +135,8 @@ class InfixToPostfix:
         if infix_exercise[index] == ')':
             if infix_exercise[index - 1] == '(':
                 InfixToPostfix.adding_exception(EmptyBracketsException, index - 1, index + 1)
+            if infix_exercise[index - 1] in OPERATORS and infix_exercise[index - 1] not in POSTFIX_OPERATORS:
+                InfixToPostfix.adding_exception(WrongBracketsPlaceException, index - 1, index + 1)
             while len(operators) != 0 and operators[-1] != '(':
                 postfix_exercise.append(operators.pop())
             if len(operators) == 0:
@@ -146,11 +148,10 @@ class InfixToPostfix:
 
         # checking if it is a unary-minus and replace it to my custom char if its necessary
         if infix_exercise[index] == MathOperators.SUB.value and \
-                (index == 0 or infix_exercise[index - 1] in OPERATORS or infix_exercise[
-                    index - 1] == '('):
+                (index == 0 or infix_exercise[index - 1] in OPERATORS or infix_exercise[index - 1] == '(') \
+                and infix_exercise[index - 1] not in POSTFIX_OPERATORS:
             # checks if it is a unary minus which appears at the start of an expression or a sign minus
-            if index == 0 or infix_exercise[index - 1] == '(' or infix_exercise[
-                index - 1] == MathOperators.UNARY_MINUS.value:
+            if index == 0 or infix_exercise[index - 1] == '(' or infix_exercise[index - 1] == MathOperators.UNARY_MINUS.value:
                 infix_exercise = infix_exercise[:index] + MathOperators.UNARY_MINUS.value + infix_exercise[index + 1:]
                 if index + 1 != len(infix_exercise) and not (
                         str.isdigit(infix_exercise[index + 1]) or infix_exercise[index + 1] == MathOperators.SUB.value):
@@ -176,8 +177,9 @@ class InfixToPostfix:
                 (infix_exercise[index + 1] in OPERATORS and infix_exercise[index + 1] != MathOperators.SUB.value):
             InfixToPostfix.adding_exception(NegativeOperatorException, index, index + 1)
 
-        # operator cannot appear after an operator unless the second one is a prefix operator
-        if index != 0 and infix_exercise[index] not in PREFIX_OPERATORS and infix_exercise[index - 1] in OPERATORS:
+        # operator cannot appear after an operator unless the second one is a prefix operator or the first is a postfix
+        if index != 0 and infix_exercise[index] not in PREFIX_OPERATORS and infix_exercise[index - 1] in OPERATORS\
+                and infix_exercise[index - 1] not in POSTFIX_OPERATORS:
             InfixToPostfix.adding_exception(OperatorAfterOperatorException, index - 1, index + 1)
 
         while len(operators) != 0 and len(postfix_exercise) != 0 and \

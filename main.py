@@ -1,4 +1,8 @@
+import random
+
 from ui_calculator import UI
+OPTIONS = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ' ', '.', '(', ')', '-', '+', '*', '/', '^', '@', '$', '&',
+           '%', '~', '!', '#']
 
 
 def main():
@@ -9,7 +13,10 @@ def main():
         if equation == "help":
             UI.full_explain()
         else:
-            UI.check_result(equation)
+            try:
+                UI.check_result(equation)
+            except Exception:
+                print("The equation you entered isn't valid.")
         print('\nEnter another equation to check its result! ("exit" to exit and "help" for explanation)')
         equation = input()
 
