@@ -1,7 +1,7 @@
 from calculator_interface import Calculator
+from exceptions import EmptyEquationException
 from infix_postfix import InfixToPostfix
 from postfix_result import GoingOverTheExercise
-from exceptions import EmptyEquationException
 
 
 class Calculation(Calculator):
@@ -12,8 +12,13 @@ class Calculation(Calculator):
     """
     @staticmethod
     def calculation_answer(infix_exercise: str) -> list or dict or Exception:
+        # remove the meaningless spaces
+        infix_exercise = infix_exercise.replace(' ', '')
+        infix_exercise = infix_exercise.replace('\t', '')
+
         if len(infix_exercise) == 0:
-            return EmptyEquationException()
+            raise EmptyEquationException()
+
         postfix_exercise = InfixToPostfix.infix_to_postfix(infix_exercise)
         if type(postfix_exercise) is dict:  # exceptions were found in the infix to postfix part
             return postfix_exercise    # exceptions dict

@@ -42,7 +42,7 @@ class Div(ArithmeticFuncs):
     @staticmethod
     def resolve(arg1: float, arg2: float) -> float or Exception:
         if arg2 == 0:
-            return DivisionByZeroException(arg1)
+            raise DivisionByZeroException(arg1)
         return arg1 / arg2
 
 
@@ -53,8 +53,8 @@ class Power(ArithmeticFuncs):
 
     @staticmethod
     def resolve(arg1: float, arg2: float) -> float:
-        if arg1 < 0 and -1 < arg2 < 1:
-            return WrongPowException()
+        if arg1 < 0 and arg2 % 1 != 0:
+            raise WrongPowException()
         return pow(arg1, arg2)
 
 
@@ -117,9 +117,9 @@ class Factorial(ArithmeticFuncs):
     @staticmethod
     def resolve(arg: float) -> float or Exception:
         if arg < 0:
-            return NegativeOperandException('!', arg)
+            raise NegativeOperandException('!', arg)
         if arg % 1 != 0:
-            return FloatFactorialException(arg)
+            raise FloatFactorialException(arg)
 
         if arg == 0:
             return 1
@@ -135,7 +135,7 @@ class SumDigits(ArithmeticFuncs):
     @staticmethod
     def resolve(arg: int) -> int or Exception:
         if arg < 0:
-            return NegativeOperandException('#', arg)
+            raise NegativeOperandException('#', arg)
 
         num = str(arg)
         summary = 0

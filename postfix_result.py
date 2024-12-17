@@ -1,5 +1,7 @@
 from MATH_OPERATORS import MathOperators
 from arithmethic_functions import *
+from exceptions import TooLongNumberException, NegativeOperandException, DivisionByZeroException, FloatFactorialException, WrongPowException
+
 
 CLASS_DICT = {MathOperators.ADD.value: Add, MathOperators.SUB.value: Sub, MathOperators.MUL.value: Mul,
               MathOperators.DIV.value: Div, MathOperators.POW.value: Power, MathOperators.AVG.value: Average,
@@ -11,6 +13,8 @@ OPERATORS = set(operator.value for operator in MathOperators)
 
 UNARY_FUNCS = [MathOperators.FACTORIAL.value, MathOperators.NEG.value,
                MathOperators.UNARY_MINUS.value, MathOperators.SUM_DIGIT.value]
+
+MATH_EXCEPTIONS = [NegativeOperandException, DivisionByZeroException, FloatFactorialException, WrongPowException]
 
 
 class GoingOverTheExercise:
@@ -40,7 +44,12 @@ class GoingOverTheExercise:
                     arg = postfix_exercise.pop(index - 1)
                     index -= 1
 
-                    result = CLASS_DICT[func].resolve(arg)
+                    try:
+                        result = CLASS_DICT[func].resolve(arg)
+                    except Exception as e:
+                        if type(e) not in MATH_EXCEPTIONS:  # making sure it is a python exception and not our custom exceptions
+                            raise TooLongNumberException()
+                        raise   # raising our custom exception
 
                 else:
                     func = postfix_exercise.pop(index)
@@ -48,10 +57,13 @@ class GoingOverTheExercise:
                     arg1 = postfix_exercise.pop(index - 2)
                     index -= 2
 
-                    result = CLASS_DICT[func].resolve(arg1, arg2)
+                    try:
+                        result = CLASS_DICT[func].resolve(arg1, arg2)
+                    except Exception as e:
+                        if type(e) not in MATH_EXCEPTIONS:  # making sure it is a python exception and not our custom exceptions
+                            raise TooLongNumberException()
+                        raise   # raising our custom exception
 
-                if isinstance(result, Exception):   # checks if an exception was found
-                    return result
                 postfix_exercise.insert(index, result)
 
             index += 1

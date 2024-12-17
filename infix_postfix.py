@@ -1,7 +1,8 @@
 from MATH_OPERATORS import MathOperators
 from exceptions import OperatorAtFirstException, OperatorAfterOperatorException, ImpossibleNumberException, \
     UnknownCharException, BracketsWithoutEndOrStartException, OperatorAtLastException, WrongBracketsPlaceException, \
-    EmptyBracketsException, NegativeOperatorException, UnaryMinusPlaceException, DecimalPointException
+    EmptyBracketsException, NegativeOperatorException, UnaryMinusPlaceException, DecimalPointException, \
+    PostfixOperatorException
 
 # I chose to call 'U' as unary-minus
 OPERATORS_PRIORITY_DICT = {MathOperators.ADD.value: 1, MathOperators.SUB.value: 1, MathOperators.MUL.value: 2,
@@ -14,6 +15,9 @@ OPERATORS = set(operator.value for operator in MathOperators)
 
 POSTFIX_OPERATORS = {MathOperators.SUM_DIGIT.value, MathOperators.FACTORIAL.value, ')'}
 PREFIX_OPERATORS = {MathOperators.NEG.value, MathOperators.UNARY_MINUS.value, MathOperators.SUB.value, '('}
+BINARY_OPERATORS = {MathOperators.ADD.value, MathOperators.SUB.value, MathOperators.MUL.value, MathOperators.DIV.value,
+                    MathOperators.POW.value, MathOperators.AVG.value, MathOperators.MAX.value, MathOperators.MIN.value,
+                    MathOperators.MODULO.value}
 
 EXCEPTIONS_DICT = dict()
 
@@ -33,8 +37,6 @@ class InfixToPostfix:
         """
         # clear the exceptions from the last equation
         EXCEPTIONS_DICT.clear()
-        # remove the meaningless spaces
-        infix_exercise = infix_exercise.replace(' ', '')
 
         operators = []
         postfix_exercise = []
@@ -85,7 +87,6 @@ class InfixToPostfix:
         :param flag: boolean parameter that signs if the number is negative number according to the unary minuses
         :return: the updated index
         """
-
         # brackets exceptions checking
         if (index + 1 != len(infix_exercise) and infix_exercise[index + 1] == '(') or \
                 (index != 0 and infix_exercise[index - 1] == ')'):
@@ -147,11 +148,12 @@ class InfixToPostfix:
             return index
 
         # checking if it is a unary-minus and replace it to my custom char if its necessary
-        if infix_exercise[index] == MathOperators.SUB.value and \
-                (index == 0 or infix_exercise[index - 1] in OPERATORS or infix_exercise[index - 1] == '(') \
-                and infix_exercise[index - 1] not in POSTFIX_OPERATORS:
+        if infix_exercise[index] == MathOperators.SUB.value and index == 0 or \
+                infix_exercise[index - 1] not in POSTFIX_OPERATORS and \
+                (infix_exercise[index - 1] in OPERATORS or infix_exercise[index - 1] == '('):
             # checks if it is a unary minus which appears at the start of an expression or a sign minus
-            if index == 0 or infix_exercise[index - 1] == '(' or infix_exercise[index - 1] == MathOperators.UNARY_MINUS.value:
+            if index == 0 or infix_exercise[index - 1] == '(' or \
+                    infix_exercise[index - 1] == MathOperators.UNARY_MINUS.value:
                 infix_exercise = infix_exercise[:index] + MathOperators.UNARY_MINUS.value + infix_exercise[index + 1:]
                 if index + 1 != len(infix_exercise) and not (
                         str.isdigit(infix_exercise[index + 1]) or infix_exercise[index + 1] == MathOperators.SUB.value):
@@ -172,15 +174,20 @@ class InfixToPostfix:
         if index == 0 and infix_exercise[0] not in PREFIX_OPERATORS:
             InfixToPostfix.adding_exception(OperatorAtFirstException, index, index + 1)
 
-        # ~ can appear only before a number, unary minus, and brackets
-        if index + 1 != len(infix_exercise) and infix_exercise[index] == MathOperators.NEG.value and \
-                (infix_exercise[index + 1] in OPERATORS and infix_exercise[index + 1] != MathOperators.SUB.value):
+        # ~ can appear only after a binary operator '('
+        if index != 0 and infix_exercise[index] == MathOperators.NEG.value and \
+                infix_exercise[index - 1] not in BINARY_OPERATORS and infix_exercise[index - 1] != '(':
             InfixToPostfix.adding_exception(NegativeOperatorException, index, index + 1)
 
         # operator cannot appear after an operator unless the second one is a prefix operator or the first is a postfix
-        if index != 0 and infix_exercise[index] not in PREFIX_OPERATORS and infix_exercise[index - 1] in OPERATORS\
+        if index != 0 and infix_exercise[index] not in PREFIX_OPERATORS and infix_exercise[index - 1] in OPERATORS \
                 and infix_exercise[index - 1] not in POSTFIX_OPERATORS:
             InfixToPostfix.adding_exception(OperatorAfterOperatorException, index - 1, index + 1)
+
+        # after a postfix operator we have to get an operator or ')'
+        if index + 1 != len(infix_exercise) and infix_exercise[index] in POSTFIX_OPERATORS and \
+                infix_exercise[index + 1] not in OPERATORS and infix_exercise[index + 1] != ')':
+            InfixToPostfix.adding_exception(PostfixOperatorException, index, index + 1)
 
         while len(operators) != 0 and len(postfix_exercise) != 0 and \
                 InfixToPostfix._stronger_operator(operators[-1], infix_exercise[index]):

@@ -1,13 +1,13 @@
 def format_number(num: float) -> str:
     """
-    This function gets a number and change it into string format. If the number is integer, so it will return it in the
+    This function gets a number and change it into string format. If the number is integer, it will return it in the
     correct format and if the number is float it will return a string of the number with 3 digits after the point.
     :param num:  float or int number
     :return: string format of the number
     """
     if num % 1 == 0:
         return f"{int(num)}"
-    return f"{num}"
+    return "%.3f" % num
 
 
 class NegativeOperandException(Exception):
@@ -45,7 +45,7 @@ class WrongPowException(Exception):
         super().__init__()
 
     def __str__(self):
-        return f"Pow cannot get an negative base and exponent between -1 and 1, because its like negative sqrt."
+        return f"Power cannot get a negative base and a float exponent, because its like negative sqrt."
 
 
 class ImpossibleNumberException(Exception):
@@ -101,7 +101,7 @@ class NegativeOperatorException(Exception):
         super().__init__()
 
     def __str__(self):
-        return "The ~ operator can appear only before numbers"
+        return "The ~ operator can appear only before numbers and after operators"
 
 
 class UnaryMinusPlaceException(Exception):
@@ -110,6 +110,14 @@ class UnaryMinusPlaceException(Exception):
 
     def __str__(self):
         return f"Unary minus can appear only before a number or additional unary minus"
+
+
+class PostfixOperatorException(Exception):
+    def __init__(self):
+        super().__init__()
+
+    def __str__(self):
+        return "After a postfix operator we can get only an operator or ')'"
 
 
 class BracketsWithoutEndOrStartException(Exception):
@@ -142,3 +150,11 @@ class DecimalPointException(Exception):
 
     def __str__(self):
         return f"Float numbers must contain digits before the decimal point"
+
+
+class TooLongNumberException(Exception):
+    def __init__(self):
+        super().__init__()
+
+    def __str__(self):
+        return f"This number is too long, so the calculator can't handle it."

@@ -1,5 +1,7 @@
 from calculation import Calculation
 from colorama import Fore, Style
+from exceptions import NegativeOperandException, DivisionByZeroException, FloatFactorialException, \
+    WrongPowException, TooLongNumberException, EmptyEquationException
 
 
 class UI:
@@ -13,9 +15,9 @@ class UI:
         """
         This function prints the first explanation about the calculator. This explanation appears when we open the calc.
         """
-        print(f'Welcome to my calculator :) \nIn this calculator you can use a lot of functions.\n'
-              f'[+,-,*,/,^,@,$,&,%,~,!,#]\nEnter "help" to see the deep explanation about the operators.\n'
-              f'Enter "exit" to exit from the calculator.')
+        print(f'Welcome to my calculator :) \nIn this calculator you can use a lot of functions:\n'
+              f'[+,-,*,/,^,@,$,&,%,~,!,#]\nEnter "help" to read the full explanation about the operators.\n'
+              f'Enter "exit" to exit the calculator.')
 
     @staticmethod
     def full_explain():
@@ -31,9 +33,9 @@ class UI:
               f'"$" - Maximum number between the two.\n'
               f'"&" - Minimum number between the two.\n'
               f'"%" - Modulo operator.\n'
-              f'"~" - Negative operator - gets a number and changes its sign.\n'
+              f'"~" - Negative operator - gets a number and changes its sign - ~x.\n'
               f'"!" - Factorial operator - x!.\n'
-              f'"#" - Summary digits operator - x#, gets a number and summary its digits.\n')
+              f'"#" - Summary digits operator - x#, gets a number and summarize its digits.\n')
 
     @staticmethod
     def check_result(equation: str):
@@ -43,7 +45,15 @@ class UI:
         Otherwise, it prints the result in the correct format.
         :param equation: the equation the client entered
         """
-        result = Calculation.calculation_answer(equation)
+        try:
+            result = Calculation.calculation_answer(equation)
+        except (FloatFactorialException, TooLongNumberException, WrongPowException,
+                DivisionByZeroException, NegativeOperandException, EmptyEquationException) as e:
+            print(e.__str__())
+            return
+        except Exception:
+            print("The equation you entered isn't valid.")
+            return
         if type(result) is float or type(result) is int:
             UI.print_result(equation, result)
         else:
@@ -63,7 +73,7 @@ class UI:
         if result % 1 == 0:
             print(f"{equation} = {int(result)}")
         else:
-            print(f"{equation} = {result}")
+            print("%s = %.3f" % (equation, result))
 
     @staticmethod
     def print_exceptions(equation: str, exceptions_dict: dict):
