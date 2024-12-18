@@ -101,7 +101,7 @@ class NegativeOperatorException(Exception):
         super().__init__()
 
     def __str__(self):
-        return "The ~ operator can appear only before numbers and after operators"
+        return "The ~ operator can appear only at the start of the equation, or after binary operators, or after '('"
 
 
 class UnaryMinusPlaceException(Exception):

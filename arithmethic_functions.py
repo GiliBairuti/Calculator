@@ -140,6 +140,9 @@ class SumDigits(ArithmeticFuncs):
         num = str(arg)
         summary = 0
         for dig in num:
+            # exponent expression
+            if dig == 'e':
+                raise Exception()
             if str.isdigit(dig):
                 summary += int(dig)
         return summary

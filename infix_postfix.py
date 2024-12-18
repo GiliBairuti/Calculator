@@ -110,13 +110,14 @@ class InfixToPostfix:
             InfixToPostfix.adding_exception(ImpossibleNumberException, start_of_number_index, index)
 
         else:
+            try:
+                number = int(infix_exercise[start_of_number_index:index])
+            except ValueError:  # can't convert from float to int
+                number = float(infix_exercise[start_of_number_index:index])
             # negative number
             if flag:
-                postfix_exercise.append(-float(infix_exercise[start_of_number_index:index]))
-
-            # positive number
-            else:
-                postfix_exercise.append(float(infix_exercise[start_of_number_index:index]))
+                number = -number
+            postfix_exercise.append(number)
 
         return index
 
@@ -148,9 +149,9 @@ class InfixToPostfix:
             return index
 
         # checking if it is a unary-minus and replace it to my custom char if its necessary
-        if infix_exercise[index] == MathOperators.SUB.value and index == 0 or \
-                infix_exercise[index - 1] not in POSTFIX_OPERATORS and \
-                (infix_exercise[index - 1] in OPERATORS or infix_exercise[index - 1] == '('):
+        if infix_exercise[index] == MathOperators.SUB.value and \
+                (index == 0 or infix_exercise[index - 1] in PREFIX_OPERATORS or infix_exercise[
+                    index - 1] in BINARY_OPERATORS):
             # checks if it is a unary minus which appears at the start of an expression or a sign minus
             if index == 0 or infix_exercise[index - 1] == '(' or \
                     infix_exercise[index - 1] == MathOperators.UNARY_MINUS.value:
@@ -174,7 +175,7 @@ class InfixToPostfix:
         if index == 0 and infix_exercise[0] not in PREFIX_OPERATORS:
             InfixToPostfix.adding_exception(OperatorAtFirstException, index, index + 1)
 
-        # ~ can appear only after a binary operator '('
+        # ~ can appear only after a binary operator or '('
         if index != 0 and infix_exercise[index] == MathOperators.NEG.value and \
                 infix_exercise[index - 1] not in BINARY_OPERATORS and infix_exercise[index - 1] != '(':
             InfixToPostfix.adding_exception(NegativeOperatorException, index, index + 1)
