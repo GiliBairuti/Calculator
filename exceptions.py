@@ -77,7 +77,7 @@ class OperatorAfterOperatorException(Exception):
         super().__init__()
 
     def __str__(self):
-        return f"Operator cannot appear after an operator unless it is a prefix operator"
+        return f"Operator cannot appear after an operator unless the first is a prefix operator"
 
 
 class OperatorAtFirstException(Exception):
@@ -101,7 +101,7 @@ class NegativeOperatorException(Exception):
         super().__init__()
 
     def __str__(self):
-        return "The ~ operator can appear only at the start of the equation, or after binary operators, or after '('"
+        return "The ~ operator can appear only at the start of the equation, after binary operators and after '('"
 
 
 class UnaryMinusPlaceException(Exception):
@@ -109,7 +109,7 @@ class UnaryMinusPlaceException(Exception):
         super().__init__()
 
     def __str__(self):
-        return f"Unary minus can appear only before a number or additional unary minus"
+        return f"Unary minus can appear only before a number, additional unary minus and '('"
 
 
 class PostfixOperatorException(Exception):
@@ -117,7 +117,7 @@ class PostfixOperatorException(Exception):
         super().__init__()
 
     def __str__(self):
-        return "After a postfix operator we can get only an operator or ')'"
+        return "Postfix operator can appear only after an expression"
 
 
 class BracketsWithoutEndOrStartException(Exception):

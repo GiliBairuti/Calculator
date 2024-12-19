@@ -54,6 +54,7 @@ class UI:
         except Exception:
             print("The equation you entered isn't valid.")
             return
+        # The equation was valid
         if type(result) is float or type(result) is int:
             UI.print_result(equation, result)
         else:

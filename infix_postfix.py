@@ -54,21 +54,21 @@ class InfixToPostfix:
 
                 else:
                     if infix_exercise[index] == '.':
-                        InfixToPostfix.adding_exception(DecimalPointException, index, index + 1)
+                        InfixToPostfix._adding_exception(DecimalPointException, index, index + 1)
 
                     else:
-                        InfixToPostfix.adding_exception(UnknownCharException, index, index + 1)
+                        InfixToPostfix._adding_exception(UnknownCharException, index, index + 1)
                     index += 1
 
         if not (str.isdigit(infix_exercise[-1]) or infix_exercise[-1] in POSTFIX_OPERATORS):
-            InfixToPostfix.adding_exception(OperatorAtLastException, index - 1, index)
+            InfixToPostfix._adding_exception(OperatorAtLastException, index - 1, index)
 
         bracket_index = -1
         # add the operators that were left
         while len(operators) != 0:
             if operators[-1] == '(':  # there is an opening bracket without closing
                 bracket_index = infix_exercise.index('(', bracket_index + 1, len(infix_exercise))
-                InfixToPostfix.adding_exception(BracketsWithoutEndOrStartException, bracket_index, bracket_index + 1)
+                InfixToPostfix._adding_exception(BracketsWithoutEndOrStartException, bracket_index, bracket_index + 1)
             postfix_exercise.append(operators.pop(len(operators) - 1))
 
         if len(EXCEPTIONS_DICT) != 0:  # there are exceptions in this part
@@ -90,7 +90,7 @@ class InfixToPostfix:
         # brackets exceptions checking
         if (index + 1 != len(infix_exercise) and infix_exercise[index + 1] == '(') or \
                 (index != 0 and infix_exercise[index - 1] == ')'):
-            InfixToPostfix.adding_exception(WrongBracketsPlaceException, index, index + 1)
+            InfixToPostfix._adding_exception(WrongBracketsPlaceException, index, index + 1)
 
         start_of_number_index = index
         decimal_point = False
@@ -98,16 +98,16 @@ class InfixToPostfix:
         while (index + 1 != len(infix_exercise)) and (
                 str.isdigit(infix_exercise[index + 1]) or (infix_exercise[index + 1] == '.')):
             if infix_exercise[index + 1] == '.':
-                if decimal_point is True:  # this number has or more decimal points
+                if decimal_point is True:  # this number has two or more decimal points
                     is_exception = True
                 decimal_point = True
             index += 1
 
-        index += 1
+        index += 1  # getting to the next char
 
-        # the number isn't logic - has more than one decimal point
+        # the number isn't making sense - has more than one decimal point
         if is_exception:
-            InfixToPostfix.adding_exception(ImpossibleNumberException, start_of_number_index, index)
+            InfixToPostfix._adding_exception(ImpossibleNumberException, start_of_number_index, index)
 
         else:
             try:
@@ -125,7 +125,7 @@ class InfixToPostfix:
     def _operator_handling(infix_exercise: str, postfix_exercise: list, operators: list, index: int) -> int:
         """
         This class gets a string of infix expression, a list of the postfix expression, a list with operators
-        and an index which point on the start of a number.
+        and an index which points on the start of a number.
         The class handles with an operator according to the postfix representation
         :param infix_exercise: a string which is an infix expression
         :param postfix_exercise: a list which handled part of the postfix expression of the infix_exercise
@@ -135,62 +135,28 @@ class InfixToPostfix:
         """
         # the treatment of brackets is different because it always in the first priority
         if infix_exercise[index] == ')':
-            if infix_exercise[index - 1] == '(':
-                InfixToPostfix.adding_exception(EmptyBracketsException, index - 1, index + 1)
-            if infix_exercise[index - 1] in OPERATORS and infix_exercise[index - 1] not in POSTFIX_OPERATORS:
-                InfixToPostfix.adding_exception(WrongBracketsPlaceException, index - 1, index + 1)
-            while len(operators) != 0 and operators[-1] != '(':
-                postfix_exercise.append(operators.pop())
-            if len(operators) == 0:
-                InfixToPostfix.adding_exception(BracketsWithoutEndOrStartException, index, index + 1)
-            else:
-                operators.pop()
+            InfixToPostfix._brackets_handling(infix_exercise, postfix_exercise, operators, index)
             index += 1
             return index
 
-        # checking if it is a unary-minus and replace it to my custom char if its necessary
-        if infix_exercise[index] == MathOperators.SUB.value and \
-                (index == 0 or infix_exercise[index - 1] in PREFIX_OPERATORS or infix_exercise[
-                    index - 1] in BINARY_OPERATORS):
-            # checks if it is a unary minus which appears at the start of an expression or a sign minus
+        # checks if it is a unary-minus (or sign minus)
+        if infix_exercise[index] == MathOperators.SUB.value and (
+                index == 0 or infix_exercise[index - 1] in PREFIX_OPERATORS
+                or infix_exercise[index - 1] in BINARY_OPERATORS):
+            # checks if it is a unary minus which appears at the start of an expression.
             if index == 0 or infix_exercise[index - 1] == '(' or \
                     infix_exercise[index - 1] == MathOperators.UNARY_MINUS.value:
                 infix_exercise = infix_exercise[:index] + MathOperators.UNARY_MINUS.value + infix_exercise[index + 1:]
-                if index + 1 != len(infix_exercise) and not (
-                        str.isdigit(infix_exercise[index + 1]) or infix_exercise[index + 1] == MathOperators.SUB.value
-                        or infix_exercise[index + 1] == '('
-                        ):
+                # checks if the unary minus is before a number
+                if index + 1 != len(infix_exercise) and infix_exercise[index + 1] in OPERATORS \
+                        and infix_exercise[index + 1] != MathOperators.SUB.value:
                     InfixToPostfix.adding_exception(UnaryMinusPlaceException, index, index + 1)
+            # it is a sign minus
             else:
-                post = False
-                if infix_exercise[index - 1] in POSTFIX_OPERATORS:
-                    postfix_exercise.append(operators.pop())
-                    post = True
-                index = InfixToPostfix._strong_unary_minus(infix_exercise, index, operators)
-
-                if post:  # if the operator before the unary minus is a postfix operator than we have to add +
-                    postfix_exercise.append(MathOperators.ADD.value)
-                # in this situation we already handled the operator (unary-minus) so we can go back to the main loop
+                index = InfixToPostfix._sign_minus_handling(infix_exercise, index, operators)
                 return index
 
-        # an equation cannot start with an operator unless it is a prefix operator
-        if index == 0 and infix_exercise[0] not in PREFIX_OPERATORS:
-            InfixToPostfix.adding_exception(OperatorAtFirstException, index, index + 1)
-
-        # ~ can appear only after a binary operator or '('
-        if index != 0 and infix_exercise[index] == MathOperators.NEG.value and \
-                infix_exercise[index - 1] not in BINARY_OPERATORS and infix_exercise[index - 1] != '(':
-            InfixToPostfix.adding_exception(NegativeOperatorException, index, index + 1)
-
-        # operator cannot appear after an operator unless the second one is a prefix operator or the first is a postfix
-        if index != 0 and infix_exercise[index] not in PREFIX_OPERATORS and infix_exercise[index - 1] in OPERATORS \
-                and infix_exercise[index - 1] not in POSTFIX_OPERATORS:
-            InfixToPostfix.adding_exception(OperatorAfterOperatorException, index - 1, index + 1)
-
-        # after a postfix operator we have to get an operator or ')'
-        if index + 1 != len(infix_exercise) and infix_exercise[index] in POSTFIX_OPERATORS and \
-                infix_exercise[index + 1] not in OPERATORS and infix_exercise[index + 1] != ')':
-            InfixToPostfix.adding_exception(PostfixOperatorException, index, index + 1)
+        InfixToPostfix._operators_exceptions(infix_exercise, index)
 
         while len(operators) != 0 and len(postfix_exercise) != 0 and \
                 InfixToPostfix._stronger_operator(operators[-1], infix_exercise[index]):
@@ -198,6 +164,29 @@ class InfixToPostfix:
         operators.append(infix_exercise[index])
         index += 1
         return index
+
+    @staticmethod
+    def _brackets_handling(infix_exercise: str, postfix_exercise: list, operators: list, index: int):
+        """
+        This class gets a string of infix expression, a list of the postfix expression, a list with operators
+        and an index which points on ')'.
+        The class handles with the brackets and updates the variables.
+        :param infix_exercise: a string which is an infix expression
+        :param postfix_exercise: a list which handled part of the postfix expression of the infix_exercise
+        :param operators: a list with the operators that were left
+        :param index: the index of the '('
+        """
+        if infix_exercise[index - 1] == '(':
+            InfixToPostfix._adding_exception(EmptyBracketsException, index - 1, index + 1)
+        if infix_exercise[index - 1] in OPERATORS and infix_exercise[index - 1] not in POSTFIX_OPERATORS:
+            InfixToPostfix._adding_exception(WrongBracketsPlaceException, index - 1, index + 1)
+
+        while len(operators) != 0 and operators[-1] != '(':
+            postfix_exercise.append(operators.pop())
+        if len(operators) == 0:
+            InfixToPostfix._adding_exception(BracketsWithoutEndOrStartException, index, index + 1)
+        else:
+            operators.pop()
 
     @staticmethod
     def _stronger_operator(operator1: chr, operator2: chr) -> bool:
@@ -218,12 +207,12 @@ class InfixToPostfix:
         return True if OPERATORS_PRIORITY_DICT[operator1] >= OPERATORS_PRIORITY_DICT[operator2] else False
 
     @staticmethod
-    def _strong_unary_minus(infix_exercise: str, index: int, operators: list) -> int:
+    def _sign_minus_handling(infix_exercise: str, index: int, operators: list) -> int:
         """
        This func gets an infix expression and an index. This index is the start of a number which starts with unary
        minus, we have to count the minuses and check if the number is positive or negative
        according to the minuses. The function returns the first index after the number ends.
-       :param infix_exercise:   infix expression
+        :param infix_exercise: a string which is an infix expression
        :param index: the index of the first unary minus
        :param operators: the left operators in the operators list of the algorithm
        :return: the updated index
@@ -235,7 +224,7 @@ class InfixToPostfix:
 
         # Unary minus can appear only before number
         if index == len(infix_exercise) or infix_exercise[index] in OPERATORS:
-            InfixToPostfix.adding_exception(UnaryMinusPlaceException, index - 1, index)
+            InfixToPostfix._adding_exception(UnaryMinusPlaceException, index - 1, index)
 
         else:
             # negative number
@@ -245,7 +234,33 @@ class InfixToPostfix:
         return index
 
     @staticmethod
-    def adding_exception(exception_key: Exception, start_index: int, end_index: int):
+    def _operators_exceptions(infix_exercise: str, index: int):
+        """
+        This func checks possible exceptions on the operators and adds them to the exceptions list if there are.
+        :param infix_exercise: a string which is an infix expression
+        :param index: the current index on the infix_exercise, which points on an operator
+        """
+        # an equation cannot start with an operator unless it is a prefix operator
+        if index == 0 and infix_exercise[0] not in PREFIX_OPERATORS:
+            InfixToPostfix._adding_exception(OperatorAtFirstException, index, index + 1)
+
+        # ~ can appear only after a binary operator or '('
+        if index != 0 and infix_exercise[index] == MathOperators.NEG.value and \
+                infix_exercise[index - 1] not in BINARY_OPERATORS and infix_exercise[index - 1] != '(':
+            InfixToPostfix._adding_exception(NegativeOperatorException, index, index + 1)
+
+        # operator cannot appear after an operator unless the second one is a prefix operator or the first is a postfix
+        if index != 0 and infix_exercise[index] not in PREFIX_OPERATORS and infix_exercise[index - 1] in OPERATORS \
+                and infix_exercise[index - 1] not in POSTFIX_OPERATORS:
+            InfixToPostfix._adding_exception(OperatorAfterOperatorException, index - 1, index + 1)
+
+        # after a postfix operator we have to get an operator or ')'
+        if index + 1 != len(infix_exercise) and infix_exercise[index] in POSTFIX_OPERATORS and \
+                infix_exercise[index + 1] not in OPERATORS and infix_exercise[index + 1] != ')':
+            InfixToPostfix._adding_exception(PostfixOperatorException, index, index + 1)
+
+    @staticmethod
+    def _adding_exception(exception_key: Exception, start_index: int, end_index: int):
         """
         This function is getting an exception and add it to the exception's dictionary, if there is already this type
         of exception it adds the new one and keeps the previous exceptions.

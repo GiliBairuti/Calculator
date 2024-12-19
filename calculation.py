@@ -1,7 +1,7 @@
 from calculator_interface import Calculator
 from exceptions import EmptyEquationException
 from infix_postfix import InfixToPostfix
-from postfix_result import GoingOverTheExercise
+from postfix_result import SolveEquation
 
 
 class Calculation(Calculator):
@@ -21,7 +21,7 @@ class Calculation(Calculator):
 
         postfix_exercise = InfixToPostfix.infix_to_postfix(infix_exercise)
         if type(postfix_exercise) is dict:  # exceptions were found in the infix to postfix part
-            return postfix_exercise    # exceptions dict
+            return postfix_exercise    # exception's dictionary
 
-        return GoingOverTheExercise.postfix_to_result(postfix_exercise)
+        return SolveEquation.postfix_to_result(postfix_exercise)
 
