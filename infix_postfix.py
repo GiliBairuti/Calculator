@@ -157,7 +157,9 @@ class InfixToPostfix:
                     infix_exercise[index - 1] == MathOperators.UNARY_MINUS.value:
                 infix_exercise = infix_exercise[:index] + MathOperators.UNARY_MINUS.value + infix_exercise[index + 1:]
                 if index + 1 != len(infix_exercise) and not (
-                        str.isdigit(infix_exercise[index + 1]) or infix_exercise[index + 1] == MathOperators.SUB.value):
+                        str.isdigit(infix_exercise[index + 1]) or infix_exercise[index + 1] == MathOperators.SUB.value
+                        or infix_exercise[index + 1] == '('
+                        ):
                     InfixToPostfix.adding_exception(UnaryMinusPlaceException, index, index + 1)
             else:
                 post = False
