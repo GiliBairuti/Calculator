@@ -1,6 +1,6 @@
-from MATH_OPERATORS import MathOperators
-from arithmethic_functions import *
-from exceptions import TooLongNumberException, NegativeOperandException, DivisionByZeroException, \
+from arithmetic.MATH_OPERATORS import MathOperators
+from arithmetic.arithmetic_functions import *
+from exceptions.exceptions import TooLongNumberException, NegativeOperandException, DivisionByZeroException, \
     FloatFactorialException, WrongPowException
 
 CLASS_DICT = {MathOperators.ADD.value: Add, MathOperators.SUB.value: Sub, MathOperators.MUL.value: Mul,
@@ -40,10 +40,10 @@ class SolveEquation:
         while len(postfix_exercise) != 1:
             if postfix_exercise[index] in OPERATORS:
                 if postfix_exercise[index] in UNARY_OPERATORS:
-                    result = SolveEquation.unary_operator_calc(postfix_exercise, index)
+                    result = SolveEquation._unary_operator_calc(postfix_exercise, index)
                     index -= 1
                 else:
-                    result = SolveEquation.binary_operator_calc(postfix_exercise, index)
+                    result = SolveEquation._binary_operator_calc(postfix_exercise, index)
                     index -= 2
 
                 postfix_exercise.insert(index, result)
@@ -53,13 +53,13 @@ class SolveEquation:
         return result
 
     @staticmethod
-    def unary_operator_calc(postfix_exercise: list, index: int) -> float or Exception:
+    def _unary_operator_calc(postfix_exercise: list, index: int) -> float or Exception:
         """
         This func gets a postfix expression and an index. The index points to a unary operator.
-        The function calculates the current calculation and returns the result, or an exception if there was a problem.
+        The function calculates the current calc and returns the result, or an exception if there was a problem.
         :param: postfix_exercise: a list that holds a postfix expression
         :param: index: an index in the postfix_exercise
-        :return: the result of the calculation or an exception
+        :return: the result of the calc or an exception
         """
         func = postfix_exercise.pop(index)
         arg = postfix_exercise.pop(index - 1)
@@ -75,13 +75,13 @@ class SolveEquation:
         return result
 
     @staticmethod
-    def binary_operator_calc(postfix_exercise: list, index: int) -> float or Exception:
+    def _binary_operator_calc(postfix_exercise: list, index: int) -> float or Exception:
         """
         This func gets a postfix expression and an index. The index points to a binary operator.
-        The function calculates the current calculation and returns the result, or an exception if there was a problem.
+        The function calculates the current calc and returns the result, or an exception if there was a problem.
         :param: postfix_exercise: a list that holds a postfix expression
         :param: index: an index in the postfix_exercise
-        :return: the result of the calculation or an exception
+        :return: the result of the calc or an exception
         """
         func = postfix_exercise.pop(index)
         arg2 = postfix_exercise.pop(index - 1)

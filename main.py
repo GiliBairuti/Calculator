@@ -1,9 +1,8 @@
-from ui_calculator import UI
+from utils.ui_calculator import UI
 
 
 def main():
     UI.opening_explain()
-    print("\nLet's start! Enter your first equation.")
     equation = input()
     while equation != "exit":
         if equation == "help":

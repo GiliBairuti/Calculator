@@ -1,6 +1,6 @@
-from calculation import Calculation
+from calc.calculator import Calculation
 from colorama import Fore, Style
-from exceptions import NegativeOperandException, DivisionByZeroException, FloatFactorialException, \
+from exceptions.exceptions import NegativeOperandException, DivisionByZeroException, FloatFactorialException, \
     WrongPowException, TooLongNumberException, EmptyEquationException
 
 
@@ -17,7 +17,8 @@ class UI:
         """
         print(f'Welcome to my calculator :) \nIn this calculator you can use a lot of functions:\n'
               f'[+,-,*,/,^,@,$,&,%,~,!,#]\nEnter "help" to read the full explanation about the operators.\n'
-              f'Enter "exit" to exit the calculator.')
+              f'Enter "exit" to exit the calculator.\n'
+              f"Let's start! Enter your first equation:")
 
     @staticmethod
     def full_explain():
@@ -46,7 +47,7 @@ class UI:
         :param equation: the equation the client entered
         """
         try:
-            result = Calculation.calculation_answer(equation)
+            result = Calculation.calculation_to_result(equation)
         except (FloatFactorialException, TooLongNumberException, WrongPowException,
                 DivisionByZeroException, NegativeOperandException, EmptyEquationException) as e:
             print(e.__str__())

@@ -1,6 +1,6 @@
-from math_interface import ArithmeticFuncs
+from arithmetic.math_interface import ArithmeticFuncs
 from math import pow
-from exceptions import NegativeOperandException, DivisionByZeroException, FloatFactorialException, WrongPowException
+from exceptions.exceptions import NegativeOperandException, DivisionByZeroException, FloatFactorialException, WrongPowException
 
 
 class Add(ArithmeticFuncs):

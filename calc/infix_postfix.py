@@ -1,10 +1,10 @@
-from MATH_OPERATORS import MathOperators
-from exceptions import OperatorAtFirstException, OperatorAfterOperatorException, ImpossibleNumberException, \
+from arithmetic.MATH_OPERATORS import MathOperators
+from exceptions.exceptions import OperatorAtFirstException, OperatorAfterOperatorException, ImpossibleNumberException, \
     UnknownCharException, BracketsWithoutEndOrStartException, OperatorAtLastException, WrongBracketsPlaceException, \
     EmptyBracketsException, NegativeOperatorException, UnaryMinusPlaceException, DecimalPointException, \
     PostfixOperatorException
 
-# I chose to call 'U' as unary-minus
+# I chose to name 'U' as unary-minus
 OPERATORS_PRIORITY_DICT = {MathOperators.ADD.value: 1, MathOperators.SUB.value: 1, MathOperators.MUL.value: 2,
                            MathOperators.DIV.value: 2, MathOperators.POW.value: 3, MathOperators.AVG.value: 5,
                            MathOperators.MAX.value: 5, MathOperators.MIN.value: 5, MathOperators.MODULO.value: 4,
@@ -30,10 +30,10 @@ class InfixToPostfix:
     @staticmethod
     def infix_to_postfix(infix_exercise: str) -> list or dict:
         """
-        This function gets a string which represents a math equation in infix,
+        This function gets a string which represents a arithmetic equation in infix,
         and change it into a list of the numbers, and the chars of the operators, ordered in postfix.
         :param infix_exercise: holding a string which represents a mathematical infix expression
-        :return: list which includes the same math exercise but in postfix or exceptions dictionary
+        :return: list which includes the same arithmetic exercise but in postfix or exceptions dictionary
         """
         # clear the exceptions from the last equation
         EXCEPTIONS_DICT.clear()
