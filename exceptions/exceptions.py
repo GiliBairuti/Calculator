@@ -77,7 +77,7 @@ class OperatorAfterOperatorException(Exception):
         super().__init__()
 
     def __str__(self):
-        return f"Operator cannot appear after an operator unless the first is a prefix operator"
+        return f"Operator cannot appear after an operator unless the first is a postfix operator"
 
 
 class OperatorAtFirstException(Exception):

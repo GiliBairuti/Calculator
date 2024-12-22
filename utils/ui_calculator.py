@@ -39,6 +39,14 @@ class UI:
               f'"#" - Summary digits operator - x#, gets a number and summarize its digits.\n')
 
     @staticmethod
+    def input_equation() -> str:
+        try:
+            equation = input()
+            return equation
+        except EOFError:
+            print('You cant close the program this way - Try "exit" :)')
+
+    @staticmethod
     def check_result(equation: str):
         """
         This function gets the equation and send it to the calculator.Then it handles the result,
